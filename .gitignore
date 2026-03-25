@@ -1,0 +1,71 @@
+## Visual Studio ##
+
+# 사용자별 설정 파일
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio 로컬 설정 폴더
+.vs/
+
+# 빌드 출력 디렉토리
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# 빌드 결과물
+*.exe
+*.pdb
+*.ilk
+*.obj
+*.lib
+*.dll
+*.exp
+
+# 빌드 로그 및 중간 파일
+*.log
+*.tlog
+*.recipe
+*.idb
+*.iobj
+*.ipdb
+
+# 컴파일러 캐시
+*.slo
+*.lo
+*.o
+*.gch
+*.pch
+
+# 기타 컴파일 중간 파일
+*.d
+*.smod
+*.mod
+*.lai
+*.la
+*.a
+*.so
+*.dylib
+*.out
+*.app
+
+# NuGet 패키지
+*.nupkg
+packages/
+!**/packages/build/
+
+## JetBrains Rider ##
+.idea/
+
+## OS 생성 파일 ##
+.DS_Store
+Thumbs.db
