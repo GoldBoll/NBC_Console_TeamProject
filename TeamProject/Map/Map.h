@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 using namespace std;
+#include "../Player/Player.h"
 
 // ── 맵 상수 ──────────────────────────────────────────
 constexpr int MAP_W  = 500;
