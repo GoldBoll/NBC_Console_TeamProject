@@ -63,6 +63,9 @@
     <ClCompile Include="GameManager\InputManager.cpp">
       <Filter>GameManager</Filter>
     </ClCompile>
+    <ClCompile Include="Item\Inventory.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map\Map.h">
@@ -88,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="GameManager\InputManager.h">
       <Filter>GameManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Item\Inventory.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
