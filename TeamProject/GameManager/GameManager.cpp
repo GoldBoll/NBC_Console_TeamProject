@@ -22,8 +22,10 @@ void GameManager::Init()
     
 
     //player->SetJobName("Hero");
-    //player->SetX(MAP_W / 2);
-    //player.SetY(MAP_H / 2);
+    player->SetX(MAP_W / 2);
+    player->SetY(MAP_H / 2);
+    map.LoadStage1();
+
 
     render.DrawStaticUI();
     render.RenderHelp();
@@ -70,21 +72,25 @@ void GameManager::HandleAction(GameAction action)
     {
     case GameAction::MoveUp:
         render.AddLog("moved up",    CLR_DARK_GRAY);
+        player->SetY(player->GetY() - 1);
         needsRedraw = true;
         break;
 
     case GameAction::MoveDown:
         render.AddLog("moved down",  CLR_DARK_GRAY);
+        player->SetY(player->GetY() + 1);
         needsRedraw = true;
         break;
 
     case GameAction::MoveLeft:
         render.AddLog("moved left",  CLR_DARK_GRAY);
+        player->SetX(player->GetX() - 1);
         needsRedraw = true;
         break;
 
     case GameAction::MoveRight:
         render.AddLog("moved right", CLR_DARK_GRAY);
+        player->SetX(player->GetX() + 1);
         needsRedraw = true;
         break;
 
