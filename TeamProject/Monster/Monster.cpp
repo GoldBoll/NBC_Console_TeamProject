@@ -1,68 +1,67 @@
 ﻿#include "Monster.h"
-#include <iostream>
 
-Monster::Monster(std::string name, int hp, int power, int speed, int exp)
-    :_name(name), _hp(hp), _power(power), _speed(speed), _exp(exp)
+Monster::Monster(std::string _name, int _hp, int _atk, int _dex, int _exp)
+    :name(_name), hp(_hp), atk(_atk), dex(_dex), exp(_exp) ,x(0), y(0)
 {
 }
 
 std::string Monster::GetName()
 {
-    return _name;
+    return name;
 }
 
 int Monster::GetHP()
 {
-    return _hp;
+    return hp;
 }
 
-int Monster::GetPower()
+int Monster::GetAtk()
 {
-    return _power;
+    return atk;
 }
 
-int Monster::GetSpeed()
+int Monster::GetDex()
 {
-    return _speed;
+    return dex;
 }
 
 int Monster::GetX()
 {
-    return _x;
+    return x;
 }
 
 int Monster::GetY()
 {
-    return _y;
+    return y;
 }
 
-void Monster::SetName(std::string name)
+void Monster::SetName(std::string _name)
 {
-    _name = name;
+    name = _name;
 }
 
-void Monster::SetHP(int hp)
+void Monster::SetHP(int _hp)
 {
-    _hp = hp;
+    hp = _hp;
 }
 
-void Monster::SetPower(int power)
+void Monster::SetAtk(int _atk)
 {
-    _power = power;
+    atk = _atk;
 }
 
-void Monster::SetSpeed(int speed)
+void Monster::SetDex(int _dex)
 {
-    _speed = speed;
+    dex = _dex;
 }
 
-void Monster::SetPosition(int newX, int newY)
+void Monster::SetPosition(int _newX, int _newY)
 {
-    _x = newX;
-    _y = newY;
+    x = _newX;
+    y = _newY;
 }
 
-void Monster::TakeDamage(int damage)
+void Monster::TakeDamage(int _damage)
 {
-    _hp -= damage;
+    hp -= _damage;
 }

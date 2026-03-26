@@ -4,29 +4,29 @@
 class Monster
 {
 protected:
-    std::string _name;
-    int _hp;
-    int _power;
-    int _speed;
-    int _exp;
-    int _x;
-    int _y;
+    std::string name;
+    int hp;
+    int atk;
+    int dex;
+    int exp;
+    int x;
+    int y;
 
 public:
-    Monster(std::string name, int hp, int power, int speed, int exp);
+    Monster(std::string _name, int _hp, int _power, int _speed, int _exp);
 
     std::string GetName();
     int GetHP();
-    int GetPower();
-    int GetSpeed();
+    int GetAtk();
+    int GetDex();
     int GetX();
     int GetY();
 
-    void SetName(std::string name);
-    void SetHP(int hp);
-    void SetPower(int power);
-    void SetSpeed(int speed);
-    void SetPosition(int newX, int newY);
+    void SetName(std::string _name);
+    void SetHP(int _hp);
+    void SetAtk(int _atk);
+    void SetDex(int _dex);
+    void SetPosition(int _newX, int _newY);
 
-    void TakeDamage(int damage);
+    void TakeDamage(int _damage);
 };
