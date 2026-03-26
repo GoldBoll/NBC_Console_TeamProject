@@ -1,52 +1,68 @@
 ﻿#include "Monster.h"
 #include <iostream>
 
-Monster::Monster(std::string name, int hp, int power, int speed)
-    :M_name(name), M_hp(hp), M_power(power), M_speed(speed)
+Monster::Monster(std::string name, int hp, int power, int speed, int exp)
+    :_name(name), _hp(hp), _power(power), _speed(speed), _exp(exp)
 {
 }
 
 std::string Monster::GetName()
 {
-    return M_name;
+    return _name;
 }
 
 int Monster::GetHP()
 {
-    return M_hp;
+    return _hp;
 }
 
 int Monster::GetPower()
 {
-    return M_power;
+    return _power;
 }
 
 int Monster::GetSpeed()
 {
-    return M_speed;
+    return _speed;
+}
+
+int Monster::GetX()
+{
+    return _x;
+}
+
+int Monster::GetY()
+{
+    return _y;
 }
 
 void Monster::SetName(std::string name)
 {
-    M_name = name;
+    _name = name;
 }
 
 void Monster::SetHP(int hp)
 {
-    M_hp = hp;
+    _hp = hp;
 }
 
 void Monster::SetPower(int power)
 {
-    M_power = power;
+    _power = power;
 }
 
 void Monster::SetSpeed(int speed)
 {
-    M_speed = speed;
+    _speed = speed;
+}
+
+void Monster::SetPosition(int newX, int newY)
+{
+    _x = newX;
+    _y = newY;
 }
 
 void Monster::TakeDamage(int damage)
 {
-    M_hp -= damage;
+    _hp -= damage;
 }
