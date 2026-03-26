@@ -129,7 +129,11 @@
     <ClCompile Include="GameManager\InputManager.cpp" />
     <ClCompile Include="Item\Item.cpp" />
     <ClCompile Include="Map\Map.cpp" />
+    <ClCompile Include="Monster\Goblin.cpp" />
+    <ClCompile Include="Monster\Golem.cpp" />
+    <ClCompile Include="Monster\Mimic.cpp" />
     <ClCompile Include="Monster\Monster.cpp" />
+    <ClCompile Include="Monster\Orc.cpp" />
     <ClCompile Include="Player\Player.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -207,6 +211,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Render\Render.cpp" />
+    <ClCompile Include="SpawnManager\SpawnManager.cpp" />
     <ClCompile Include="TeamProject.cpp" />
     <ClCompile Include="Player\Warrior.cpp" />
   </ItemGroup>
@@ -217,10 +222,15 @@
     <ClInclude Include="GameManager\InputManager.h" />
     <ClInclude Include="Item\Item.h" />
     <ClInclude Include="Map\Map.h" />
+    <ClInclude Include="Monster\Goblin.h" />
+    <ClInclude Include="Monster\Golem.h" />
+    <ClInclude Include="Monster\Mimic.h" />
     <ClInclude Include="Monster\Monster.h" />
+    <ClInclude Include="Monster\Orc.h" />
     <ClInclude Include="Player\Player.h" />
     <ClInclude Include="Render\Render.h" />
     <ClInclude Include="Player\Warrior.h" />
+    <ClInclude Include="SpawnManager\SpawnManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Weapon\" />
