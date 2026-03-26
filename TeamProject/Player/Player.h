@@ -1,6 +1,4 @@
 #pragma once
-#include "../Item/Inventory.h"
-#include "../Battle/StatusEffect.h"
 #include <string>
 #include <vector>
 using namespace std;
@@ -31,8 +29,8 @@ struct Player
     int gold      = 0;
 
     // 인벤토리 & 상태이상
-    Inventory            inventory;
-    vector<StatusEffect> statusEffects;
+    // Inventory            inventory;
+    // vector<StatusEffect> statusEffects;
 
     // ── 행동 ────────────────────────────────────────
     void tryMove(int dx, int dy, Map& map, vector<Monster>& monsters);

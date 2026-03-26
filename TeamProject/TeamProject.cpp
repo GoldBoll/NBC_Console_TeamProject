@@ -12,7 +12,6 @@
 
 
 #include <iostream>
-#include "TeamProject/Map/Map.h"
 
 int main()
 {
