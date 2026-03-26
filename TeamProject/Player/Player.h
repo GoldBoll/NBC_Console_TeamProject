@@ -55,6 +55,8 @@ public:
     void SetHp(int hp);
     void SetAtk(int atk);
     void SetDex(int dex);
+    void SetX(int x) { this->x = x; }
+    void SetY(int y) { this->y = y; }
 
     // player info
     bool IsAlive() const { return hp > 0; }

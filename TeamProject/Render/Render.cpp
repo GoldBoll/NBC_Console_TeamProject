@@ -123,14 +123,28 @@ void Render::RenderMap(const Map& map, const Player* player)
                 continue;
             }
 
-            char glyph = map.TileToChar(wx, wy);
-            switch (glyph)
+            Tile tile = map.GetTile(wx, wy);
+            char glyph;
+            switch (tile)
             {
-            case '.': SetColor(CLR_GRAY);      break;
-            case '#': SetColor(CLR_DARK_GRAY); break;
-            case 'W': SetColor(CLR_DARK_CYAN); break;
-            case '>': SetColor(CLR_YELLOW);    break;
-            default:  SetColor(CLR_GRAY);      break;
+            case Tile::Floor:
+                SetColor(CLR_DARK_GRAY);   glyph = ' '; break;
+            case Tile::Wall:
+                SetColor(CLR_GRAY);        glyph = '#'; break;
+            case Tile::Rock:
+                SetColor(CLR_DARK_YELLOW); glyph = 'R'; break;
+            case Tile::Water:
+                SetColor(CLR_DARK_CYAN);   glyph = 'W'; break;
+            case Tile::Stair:
+                SetColor(CLR_YELLOW);      glyph = '>'; break;
+            case Tile::Chest:
+                SetColor(CLR_DARK_YELLOW); glyph = 'C'; break;
+            case Tile::Monster:
+                SetColor(CLR_RED);         glyph = 'M'; break;
+            case Tile::EliteMonster:
+                SetColor(CLR_MAGENTA);     glyph = 'E'; break;
+            default:
+                SetColor(CLR_DARK_GRAY);   glyph = ' '; break;
             }
             std::cout << glyph;
         }
