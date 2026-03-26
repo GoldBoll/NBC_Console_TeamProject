@@ -39,15 +39,6 @@
     <ClCompile Include="TeamProject.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Monster.cpp">
-      <Filter>Monster</Filter>
-    </ClCompile>
-    <ClCompile Include="Weapon.cpp">
-      <Filter>Item</Filter>
-    </ClCompile>
     <ClCompile Include="Map\Map.cpp">
       <Filter>Map</Filter>
     </ClCompile>
@@ -60,23 +51,17 @@
     <ClCompile Include="Item\Item.cpp">
       <Filter>Item</Filter>
     </ClCompile>
-    <ClCompile Include="Item\Inventory.cpp">
-      <Filter>Item</Filter>
+    <ClCompile Include="Player\Player.cpp">
+      <Filter>Player</Filter>
     </ClCompile>
-    <ClCompile Include="Render\Renderer.cpp">
+    <ClCompile Include="Monster\Monster.cpp">
+      <Filter>Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
       <Filter>Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Player.h">
-      <Filter>Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Monster.h">
-      <Filter>Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="Weapon.h">
-      <Filter>Item</Filter>
-    </ClInclude>
     <ClInclude Include="Map\Map.h">
       <Filter>Map</Filter>
     </ClInclude>
@@ -86,16 +71,16 @@
     <ClInclude Include="Battle\Battle.h">
       <Filter>Battle</Filter>
     </ClInclude>
-    <ClInclude Include="Battle\StatusEffect.h">
-      <Filter>Battle</Filter>
-    </ClInclude>
     <ClInclude Include="Item\Item.h">
       <Filter>Item</Filter>
     </ClInclude>
-    <ClInclude Include="Item\Inventory.h">
-      <Filter>Item</Filter>
+    <ClInclude Include="Player\Player.h">
+      <Filter>Player</Filter>
     </ClInclude>
-    <ClInclude Include="Render\Renderer.h">
+    <ClInclude Include="Monster\Monster.h">
+      <Filter>Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="Render.h">
       <Filter>Render</Filter>
     </ClInclude>
   </ItemGroup>

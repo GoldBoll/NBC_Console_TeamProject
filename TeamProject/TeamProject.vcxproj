@@ -123,7 +123,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Battle\Battle.cpp" />
+    <ClCompile Include="GameManager\GameManager.cpp" />
+    <ClCompile Include="Item\Item.cpp" />
     <ClCompile Include="Map\Map.cpp" />
+    <ClCompile Include="Monster\Monster.cpp" />
     <ClCompile Include="Player\Player.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -200,18 +204,19 @@
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Render.cpp" />
     <ClCompile Include="TeamProject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Battle\Battle.h" />
+    <ClInclude Include="GameManager\GameManager.h" />
+    <ClInclude Include="Item\Item.h" />
     <ClInclude Include="Map\Map.h" />
+    <ClInclude Include="Monster\Monster.h" />
     <ClInclude Include="Player\Player.h" />
+    <ClInclude Include="Render.h" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Battle\" />
-    <Folder Include="GameManager\" />
-    <Folder Include="Item\" />
-    <Folder Include="Monster\" />
-    <Folder Include="Render\" />
     <Folder Include="Weapon\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
