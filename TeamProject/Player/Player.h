@@ -39,7 +39,7 @@ public:
     //virtual void attack(Monster* monster) = 0;
 
     // Getter
-    string GetJobName() const;
+    string GetJobName();
     int GetLevel()     const { return level; }
     int GetHP()        const { return hp; }
     int GetMaxHP()     const { return maxHp; }
