@@ -14,12 +14,6 @@ Player::Player() {
     expToNext = 20;
 }
 
-// Getter
-string Player::GetJobName() { return job; }
-int Player::GetLevel() { return level; }
-int Player::GetHP() { return hp; }
-int Player::GetAtk() { return atk; }
-int Player::GetDex() { return dex; }
 
 // Setter
 void Player::SetLevel(int _level) { this->hp = _level; }
@@ -82,5 +76,11 @@ bool Player::Die()
 {
     return true;
 }
+
+string Player::GetJobName()
+{
+    return jobName;
+}
+
 
 Player::~Player() { }

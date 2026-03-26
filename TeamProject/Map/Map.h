@@ -28,6 +28,4 @@ public:
     char TileToChar(int x, int y) const;
 };
 
-struct Player;
-
 void DrawViewport(const Map& map, const Player& player);

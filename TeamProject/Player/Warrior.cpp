@@ -4,7 +4,7 @@ using namespace std;
 
 Warrior::Warrior() : Player()
 {
-    job = "전사";
+    jobName = "전사";
     cout << "* 전사 입니다." << endl;
 }
 //void Warrior::attack()
@@ -21,3 +21,8 @@ void Warrior::TryMove(int _dx, int _dy, Map& _map)
 {
 
 }
+
+//string Player::GetJobName()
+//{
+//    return string();
+//}

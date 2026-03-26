@@ -1,4 +1,4 @@
-#include "Map.h"
+﻿#include "Map.h"
 #include "../Player/Player.h"
 #include <algorithm>
 using namespace std;
@@ -23,8 +23,8 @@ char Map::TileToChar(int x, int y) const
 
 void DrawViewport(const Map& map, const Player& player)
 {
-    int camX = max(0, min(player.x - VIEW_W / 2, MAP_W - VIEW_W));
-    int camY = max(0, min(player.y - VIEW_H / 2, MAP_H - VIEW_H));
+    int camX = max(0, min(player.GetX() - VIEW_W / 2, MAP_W - VIEW_W));
+    int camY = max(0, min(player.GetY() - VIEW_H / 2, MAP_H - VIEW_H));
 
     for (int row = 0; row < VIEW_H; row++)
     {
