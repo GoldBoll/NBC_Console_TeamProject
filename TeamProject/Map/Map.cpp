@@ -3,15 +3,13 @@
 #include <algorithm>
 using namespace std;
 
-// ── Map 멤버 함수 ─────────────────────────────────────
-
-bool Map::isWalkable(int x, int y) const
+bool Map::IsWalkable(int x, int y) const
 {
     return tiles[y][x] == Tile::Floor
         || tiles[y][x] == Tile::Stair;
 }
 
-char Map::tileToChar(int x, int y) const
+char Map::TileToChar(int x, int y) const
 {
     switch (tiles[y][x])
     {
@@ -23,16 +21,10 @@ char Map::tileToChar(int x, int y) const
     }
 }
 
-
-void drawViewport(const Map& map, const Player& player)
+void DrawViewport(const Map& map, const Player& player)
 {
-    // 카메라 좌상단 좌표 (플레이어 중심)
-    int camX = player.x - VIEW_W / 2;
-    int camY = player.y - VIEW_H / 2;
-
-    // 맵 경계를 벗어나지 않도록 클램프
-    camX = max(0, min(camX, MAP_W - VIEW_W));
-    camY = max(0, min(camY, MAP_H - VIEW_H));
+    int camX = max(0, min(player.x - VIEW_W / 2, MAP_W - VIEW_W));
+    int camY = max(0, min(player.y - VIEW_H / 2, MAP_H - VIEW_H));
 
     for (int row = 0; row < VIEW_H; row++)
     {
@@ -40,7 +32,7 @@ void drawViewport(const Map& map, const Player& player)
         {
             int mx = camX + col;
             int my = camY + row;
-            cout << map.tileToChar(mx, my);
+            cout << map.TileToChar(mx, my);
         }
         cout << '\n';
     }

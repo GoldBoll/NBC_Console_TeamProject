@@ -1,33 +1,33 @@
-#pragma once
+﻿#pragma once
 #include <iostream>
 using namespace std;
+#include "../Render/UILayout.h"
 #include "../Player/Player.h"
 
-// ── 맵 상수 ──────────────────────────────────────────
-constexpr int MAP_W  = 500;
-constexpr int MAP_H  = 500;
-constexpr int VIEW_W = 40;   // 콘솔 뷰포트 가로
-constexpr int VIEW_H = 20;   // 콘솔 뷰포트 세로
+// 맵 상수
+constexpr int MAP_W = 500;
+constexpr int MAP_H = 500;
+// VIEW_W, VIEW_H 는 UILayout.h 에서 Map 비율에 따라 자동 계산됩니다.
 
-// ── 타일 타입 ─────────────────────────────────────────
+// 타일 타입
 enum class Tile
 {
-    Floor,      // '.'  이동 가능
-    Wall,       // '#'  이동 불가
-    Obstacle,   // 'W'  구조물
-    Stair,      // '>'  탈출 계단
+    Floor,
+    Wall,
+    Obstacle,
+    Stair,
 };
 
-// ── 맵 데이터 ─────────────────────────────────────────
-struct Map
+// 맵 데이터
+class Map
 {
+public:
     Tile tiles[MAP_H][MAP_W];
 
-    bool isWalkable(int x, int y) const;
-    char tileToChar(int x, int y) const;
+    bool IsWalkable(int x, int y) const;
+    char TileToChar(int x, int y) const;
 };
 
-// ── 뷰포트 렌더 ───────────────────────────────────────
-struct Player;  // 전방 선언
+struct Player;
 
-void drawViewport(const Map& map, const Player& player);
+void DrawViewport(const Map& map, const Player& player);
