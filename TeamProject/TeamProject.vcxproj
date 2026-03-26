@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClCompile Include="Battle\Battle.cpp" />
     <ClCompile Include="GameManager\GameManager.cpp" />
+    <ClCompile Include="GameManager\InputManager.cpp" />
     <ClCompile Include="Item\Item.cpp" />
     <ClCompile Include="Map\Map.cpp" />
     <ClCompile Include="Monster\Monster.cpp" />
@@ -210,6 +211,7 @@
   <ItemGroup>
     <ClInclude Include="Battle\Battle.h" />
     <ClInclude Include="GameManager\GameManager.h" />
+    <ClInclude Include="GameManager\InputManager.h" />
     <ClInclude Include="Item\Item.h" />
     <ClInclude Include="Map\Map.h" />
     <ClInclude Include="Monster\Monster.h" />
