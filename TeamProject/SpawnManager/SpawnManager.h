@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "Map/Map.h"
-#include "Monster/Monster.h"
-#include "Goblin.h"
-#include "Orc.h"
-#include "Mimic.h"
-#include "Golem.h"
+#include "../Monster/Monster.h"
+#include "../Monster/Goblin.h"
+#include "../Monster/Orc.h"
+#include "../Monster/Mimic.h"
+#include "../Monster/Golem.h"
 #include <vector>
 
 class SpawnManager
