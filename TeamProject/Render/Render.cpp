@@ -96,10 +96,10 @@ void Render::RenderHelp()
     ResetColor();
 }
 
-void Render::RenderMap(const Map& map, const Player& player)
+void Render::RenderMap(const Map& map, const Player* player)
 {
-    int camX = std::max(0, std::min(player.x - VIEW_W / 2, MAP_W - VIEW_W));
-    int camY = std::max(0, std::min(player.y - VIEW_H / 2, MAP_H - VIEW_H));
+    int camX = std::max(0, std::min(player->GetX() - VIEW_W / 2, MAP_W - VIEW_W));
+    int camY = std::max(0, std::min(player->GetY() - VIEW_H / 2, MAP_H - VIEW_H));
 
     for (int row = 0; row < VIEW_H; ++row)
     {
@@ -116,7 +116,7 @@ void Render::RenderMap(const Map& map, const Player& player)
                 continue;
             }
 
-            if (wx == player.x && wy == player.y)
+            if (wx == player->GetX() && wy == player->GetY())
             {
                 SetColor(CLR_WHITE, CLR_DARK_RED);
                 std::cout << '@';
@@ -138,7 +138,7 @@ void Render::RenderMap(const Map& map, const Player& player)
     ResetColor();
 }
 
-void Render::RenderInfo(const Player& player)
+void Render::RenderInfo(Player* player)
 {
     ClearRegion(PLAYER_INFO_X + 1, PLAYER_INFO_Y + 1, MID_BOX_W - 2, PLAYER_INFO_H - 2);
 
@@ -146,17 +146,16 @@ void Render::RenderInfo(const Player& player)
 
     SetColor(CLR_WHITE);
     GotoXY(PLAYER_INFO_X + 1, y++);
-    std::cout << (player.name.empty() ? "Unknown" : player.name);
-
+    std::cout << (player->GetJobName().empty() ? "Unknown" : player->GetJobName());
     SetColor(CLR_DARK_CYAN);
     GotoXY(PLAYER_INFO_X + 1, y++);
-    std::cout << "(" << player.x << ", " << player.y << ")";
+    std::cout << "(" << player->GetX() << ", " << player->GetY() << ")";
 
     ++y;
 
     int barLen = MID_BOX_W - 6;
-    int filled = (player.maxHp > 0)
-        ? (int)((float)player.hp / player.maxHp * barLen)
+    int filled = (player->GetMaxHP() > 0)
+        ? (int)((float)player->GetHP() / player->GetMaxHP() * barLen)
         : 0;
     filled = std::max(0, std::min(filled, barLen));
 
@@ -170,18 +169,14 @@ void Render::RenderInfo(const Player& player)
 
     SetColor(CLR_GRAY);
     GotoXY(PLAYER_INFO_X + 1, ++y);
-    std::cout << player.hp << "/" << player.maxHp;
+    std::cout << player->GetHP() << "/" << player->GetMaxHP();
 
     ++y;
 
     SetColor(CLR_YELLOW);
     GotoXY(PLAYER_INFO_X + 1, ++y);
-    std::cout << "Lv." << player.level
-              << "  EXP " << player.exp << "/" << player.expToNext;
-
-    SetColor(CLR_DARK_YELLOW);
-    GotoXY(PLAYER_INFO_X + 1, ++y);
-    std::cout << "Gold: " << player.gold;
+    std::cout << "Lv." << player->GetLevel()
+              << "  EXP " << player->GetExp() << "/" << player->GetExpToNext();
 
     ResetColor();
 }

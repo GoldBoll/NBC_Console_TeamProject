@@ -1,6 +1,7 @@
-#pragma once
+﻿#pragma once
 #include <vector>
 #include "../Map/Map.h"
+#include "../Player/Warrior.h"
 #include "../Player/Player.h"
 #include "../Monster/Monster.h"
 #include "../GameManager/InputManager.h"
@@ -16,13 +17,13 @@ public:
     GameManager& operator=(const GameManager&) = delete;
 
 private:
-    GameManager() = default;
+    GameManager();
 
     void Init();
     void HandleAction(GameAction action);
 
     Map                  map;
-    Player               player;
+    Player*              player;
     std::vector<Monster> monsters;
     bool                 running     = false;
     bool                 needsRedraw = false;

@@ -6,6 +6,12 @@ GameManager& GameManager::GetInstance()
 {
     static GameManager instance;
     return instance;
+
+}
+
+GameManager::GameManager()
+{
+    player = new Warrior();
 }
 
 void GameManager::Init()
@@ -13,9 +19,11 @@ void GameManager::Init()
     Render& render = Render::GetInstance();
     render.Init("TextRPG - NBC Team Project 2");
 
-    player.name = "Hero";
-    player.x    = MAP_W / 2;
-    player.y    = MAP_H / 2;
+    
+
+    //player->SetJobName("Hero");
+    //player->SetX(MAP_W / 2);
+    //player.SetY(MAP_H / 2);
 
     render.DrawStaticUI();
     render.RenderHelp();

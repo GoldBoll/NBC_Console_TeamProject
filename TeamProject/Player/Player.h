@@ -13,7 +13,7 @@ protected:
     int x = 0, y = 0;
 
     // status
-    string job;
+    string jobName;
     int hp;
     int maxHp;
     int atk;
@@ -39,11 +39,16 @@ public:
     //virtual void attack(Monster* monster) = 0;
 
     // Getter
-    string GetJobName();
-    int GetLevel();
-    int GetHP();
-    int GetAtk();
-    int GetDex();
+    string GetJobName() const;
+    int GetLevel()     const { return level; }
+    int GetHP()        const { return hp; }
+    int GetMaxHP()     const { return maxHp; }
+    int GetExp()       const { return exp; }
+    int GetExpToNext() const { return expToNext; }
+    int GetAtk()       const { return atk; }
+    int GetDex()       const { return dex; }
+    int GetX()         const { return x; }
+    int GetY()         const { return y; }
 
     // Setter
     void SetLevel(int level);
