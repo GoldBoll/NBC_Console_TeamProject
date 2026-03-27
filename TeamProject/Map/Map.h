@@ -55,6 +55,10 @@ public:
     // 맵 전체를 특정 타일로 채움
     void Fill(Tile t) { std::fill(&tiles[0][0], &tiles[0][0] + MAP_W * MAP_H, t); }
 
+    // 주변 8방향에 Floor 타일이 하나라도 있는지 확인 (렌더링에서 벽 표시 여부 판단용)
+    bool HasFloorNeighbor(int x, int y) const;
+    
+
     char TileToChar(int x, int y)           const;
 
     void LoadStage1();
