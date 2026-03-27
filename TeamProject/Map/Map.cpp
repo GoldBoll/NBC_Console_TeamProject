@@ -3,17 +3,17 @@
 #include <algorithm>
 using namespace std;
 
-bool Map::IsWalkable(int x, int y) const
+bool Map::HasFloorNeighbor(int x, int y) const
 {
-    switch (tiles[y][x])
-    {
-        case Tile::Floor:
-        case Tile::Stair:
-        case Tile::Chest:
-            return true;
-        default:
-            return false;
+    for (int dy = -1; dy <= 1; ++dy)
+        for (int dx = -1; dx <= 1; ++dx)
+        {
+            if (dx == 0 && dy == 0) continue;
+            int nx = x + dx, ny = y + dy;
+            if (InBounds(nx, ny) && tiles[ny][nx] == Tile::Floor)
+                return true;
         }
+    return false;
 }
 
 char Map::TileToChar(int x, int y) const
@@ -28,6 +28,7 @@ char Map::TileToChar(int x, int y) const
         case Tile::Chest:        return 'C';  // 보물 상자
         case Tile::Monster:      return 'M';  // 일반 몬스터
         case Tile::EliteMonster: return 'E';  // 엘리트 몬스터
+        case Tile::Door:         return '+';  // 문
         default:                 return ' ';
     }
 }

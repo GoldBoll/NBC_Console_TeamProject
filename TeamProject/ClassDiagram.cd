@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GameManager">
+    <Position X="5.5" Y="1" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAQAAAAAAAAAAgAAAIBAgAAAABAAAiAABAAAI=</HashCode>
+      <FileName>GameManager\GameManager.h</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="player" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="InputManager">
+    <Position X="9.5" Y="1" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAgAAABAAAAAQBAACgIAAAAAA=</HashCode>
+      <FileName>GameManager\InputManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Render">
+    <Position X="5.5" Y="6" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AIIQAAAAAAAAAAACAEgJAAAAJAIAAAAAABgmAAAAAAI=</HashCode>
+      <FileName>Render\Render.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SpawnManager">
+    <Position X="9.5" Y="9.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAgAAAAAAABAAAAEAAAAAAAAAAAAI=</HashCode>
+      <FileName>SpawnManager\SpawnManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Battle">
+    <Position X="5.5" Y="11" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Battle\Battle.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Map">
+    <Position X="1" Y="1" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AREAAAAAAAAAAAEAAAAAAAAAAgAAAAgAAAAAAAIIAAA=</HashCode>
+      <FileName>Map\Map.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Player">
+    <Position X="1" Y="6" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>OQgAQAAAABAEAAYAIEIQgAARAAMAAAAA4gBggQAAApA=</HashCode>
+      <FileName>Player\Player.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Warrior">
+    <Position X="1.5" Y="15.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>Player\Warrior.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Monster">
+    <Position X="13.5" Y="1" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>IAgAAAAABAAAAAAAAAAAgAAAAAIEAgAA4gBgwAAABgA=</HashCode>
+      <FileName>Monster\Monster.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Goblin">
+    <Position X="13.5" Y="7" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Monster\Goblin.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Orc">
+    <Position X="15.5" Y="7" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Monster\Orc.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mimic">
+    <Position X="13.5" Y="9.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Monster\Mimic.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Golem">
+    <Position X="15.5" Y="9.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>Monster\Golem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Inventory">
+    <Position X="17.5" Y="4.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAUAAACAAABQAAAAAAAAgAAAAAAEAAAAAgAAAAA=</HashCode>
+      <FileName>Item\Inventory.h</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="slots" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Struct Name="Item">
+    <Position X="17.5" Y="1" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAAAACAAAQAAAAAAAAAEAAAFAAAAAAAAAAAABAA=</HashCode>
+      <FileName>Item\Item.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="Tile">
+    <Position X="9.5" Y="14.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAAAAQAgAAEAEAAAAAAAgAAQAAkAAAAAAAAA=</HashCode>
+      <FileName>Map\Map.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="GameAction">
+    <Position X="9.5" Y="6" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAIAAAAAAAAAAAAAAAAAAAIQAAAAAEAAQA=</HashCode>
+      <FileName>GameManager\InputManager.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ItemType">
+    <Position X="14.75" Y="14.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAAAAAAAACAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Item\Item.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ConsoleColor">
+    <Position X="11.75" Y="14.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>QCAAAAUAAAEQAAQAAAAAAAYAAAAAHAACAMgAAAAAAAA=</HashCode>
+      <FileName>Render\Render.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="맑은 고딕" Size="9" />
+</ClassDiagram>
