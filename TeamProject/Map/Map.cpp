@@ -3,6 +3,19 @@
 #include <algorithm>
 using namespace std;
 
+bool Map::HasFloorNeighbor(int x, int y) const
+{
+    for (int dy = -1; dy <= 1; ++dy)
+        for (int dx = -1; dx <= 1; ++dx)
+        {
+            if (dx == 0 && dy == 0) continue;
+            int nx = x + dx, ny = y + dy;
+            if (InBounds(nx, ny) && tiles[ny][nx] == Tile::Floor)
+                return true;
+        }
+    return false;
+}
+
 char Map::TileToChar(int x, int y) const
 {
     switch (tiles[y][x])
