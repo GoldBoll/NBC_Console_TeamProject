@@ -56,8 +56,6 @@ void GameManager::Run()
 
         GameAction action = input.PollInput();
         HandleAction(action);
-
-        Sleep(16);
     }
 
     system("cls");
