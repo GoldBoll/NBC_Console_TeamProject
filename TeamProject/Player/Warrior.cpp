@@ -2,9 +2,8 @@
 #include <iostream>
 using namespace std;
 
-Warrior::Warrior() : Player()
+Warrior::Warrior() : Player("전사")
 {
-    jobName = "전사";
     cout << "* 전사 입니다." << endl;
 }
 //void Warrior::attack()
