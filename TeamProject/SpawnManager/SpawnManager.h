@@ -1,14 +1,8 @@
 ﻿#pragma once
 #include "../Map/Map.h"
 #include "../Monster/Monster.h"
-#include "../Monster/Goblin.h"
-#include "../Monster/Orc.h"
-#include "../Monster/Mimic.h"
-#include "../Monster/Golem.h"
 #include "../Player/Player.h"
 #include <vector>
-
-class Map;
 
 class SpawnManager
 {
@@ -28,7 +22,7 @@ public:
         return &instance;
     }
 
-    //void SpawnMonsterInRoom(Map& _map, Room& room, int count);
-
+    //void SpawnMonstersInRooms(Map& _map, std::vector<Room>& roomList);
+    void UpdateCleanup(Map& _map);
 };
 
