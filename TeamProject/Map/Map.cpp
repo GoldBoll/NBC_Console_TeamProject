@@ -3,20 +3,6 @@
 #include <algorithm>
 using namespace std;
 
-bool Map::IsWalkable(int x, int y) const
-{
-    switch (tiles[y][x])
-    {
-        case Tile::Floor:
-        case Tile::Stair:
-        case Tile::Chest:
-        case Tile::Door:
-            return true;
-        default:
-            return false;
-        }
-}
-
 char Map::TileToChar(int x, int y) const
 {
     switch (tiles[y][x])

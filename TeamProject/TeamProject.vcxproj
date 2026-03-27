@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Battle\Battle.cpp" />
+    <ClCompile Include="BspManager\BspManager.cpp" />
     <ClCompile Include="GameManager\GameManager.cpp" />
     <ClCompile Include="Item\Inventory.cpp" />
     <ClCompile Include="GameManager\InputManager.cpp" />
@@ -234,6 +235,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Weapon\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

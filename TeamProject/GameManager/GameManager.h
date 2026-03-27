@@ -5,6 +5,7 @@
 #include "../Player/Player.h"
 #include "../Monster/Monster.h"
 #include "../GameManager/InputManager.h"
+#include "../BspManager/BspManager.h"
 
 class GameManager
 {
