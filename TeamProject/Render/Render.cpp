@@ -143,6 +143,8 @@ void Render::RenderMap(const Map& map, const Player* player)
                 SetColor(CLR_RED);         glyph = 'M'; break;
             case Tile::EliteMonster:
                 SetColor(CLR_MAGENTA);     glyph = 'E'; break;
+            case Tile::Door:
+                SetColor(CLR_DARK_YELLOW, CLR_DARK_RED); glyph = '+'; break;
             default:
                 SetColor(CLR_DARK_GRAY);   glyph = ' '; break;
             }

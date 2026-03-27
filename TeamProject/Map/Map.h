@@ -23,6 +23,7 @@ enum class Tile
     Chest,          // 'C'  보물 상자 - 아이템 획득
     Monster,        // 'M'  일반 몬스터
     EliteMonster,   // 'E'  엘리트 몬스터 - 강화된 몬스터
+    Door,           // '+'  문 - 방과 복도 사이 통로 (이동 가능)
 };
 
 // 맵 데이터
