@@ -1,6 +1,12 @@
 ﻿#pragma once
 #include <string>
 
+enum class MonsterState {
+    IDLE,
+    CHASE,
+    COMBAT
+};
+
 class Monster
 {
 protected:
@@ -12,6 +18,8 @@ protected:
     int x;
     int y;
 
+    MonsterState state = MonsterState::IDLE;
+
 public:
     Monster(std::string _name, int _hp, int _power, int _speed, int _exp);
 
@@ -21,12 +29,18 @@ public:
     int GetDex();
     int GetX();
     int GetY();
+    MonsterState GetState() const { return state; }
 
     void SetName(std::string _name);
     void SetHP(int _hp);
     void SetAtk(int _atk);
     void SetDex(int _dex);
     void SetPosition(int _newX, int _newY);
+    void SetState(MonsterState _state) { state = _state; }
 
     void TakeDamage(int _damage);
+
+
+    virtual void Update(int playerX, int playerY);
+    void MoveTowards(int targetX, int targetY);
 };
