@@ -218,6 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Battle\Battle.h" />
+    <ClInclude Include="BspManager\BspManager.h" />
     <ClInclude Include="GameManager\GameManager.h" />
     <ClInclude Include="Item\Inventory.h" />
     <ClInclude Include="GameManager\InputManager.h" />
@@ -231,6 +232,7 @@
     <ClInclude Include="Player\Player.h" />
     <ClInclude Include="Render\Render.h" />
     <ClInclude Include="Player\Warrior.h" />
+    <ClInclude Include="Render\UILayout.h" />
     <ClInclude Include="SpawnManager\SpawnManager.h" />
   </ItemGroup>
   <ItemGroup>

@@ -84,6 +84,9 @@
     <ClCompile Include="SpawnManager\SpawnManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="BspManager\BspManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Map\Map.h">
@@ -129,6 +132,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="SpawnManager\SpawnManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="BspManager\BspManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\UILayout.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

@@ -25,7 +25,7 @@ private:
 
     Map                  map;
     Player*              player;
-    std::vector<Monster> monsters;
+    std::vector<Monster*> monsters;
     bool                 running     = false;
     bool                 needsRedraw = false;
 };

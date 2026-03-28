@@ -17,34 +17,39 @@ SpawnManager::~SpawnManager()
     activeMonsters.clear();
 }
 
-//void SpawnManager::SpawnMonstersInRooms(Map& _map, std::vector<Room>& roomList)
-//{
-//    for (const auto& room : roomList)
-//    {
-//        int monsterCount = (rand() % 4) + 1;
-//
-//        int spawned = 0;
-//        int attempts = 0;
-//
-//        while (spawned < 3 && attempts < 20)
-//        {
-//            attempts++;
-//
-//            int rx = room.x + 1 + (rand() % (room.width - 2));
-//            int ry = room.y + 1 + (rand() % (room.height - 2));
-//
-//            if (_map.GetTile(rx, ry) == Tile::Floor)
-//            {
-//                Monster* newMonster = new Goblin();
-//                newMonster->SetPosition(rx, ry);
-//                activeMonsters.push_back(newMonster);
-//                _map.SetTile(rx, ry, Tile::Monster);
-//
-//                spawned++;
-//            }
-//        }
-//    }
-//}
+const vector<Monster*>& SpawnManager::GetActiveMonsters() const
+{
+    return activeMonsters;
+}
+
+void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& roomList)
+{
+    for (const auto& room : roomList)
+    {
+        int monsterCount = (rand() % 4) + 1;
+
+        int spawned = 0;
+        int attempts = 0;
+
+        while (spawned < monsterCount && attempts < 10)
+        {
+            attempts++;
+
+            int rx = room.x + 1 + (rand() % (room.w - 2));
+            int ry = room.y + 1 + (rand() % (room.h - 2));
+
+            if (_map.GetTile(rx, ry) == Tile::Floor)
+            {
+                Monster* newMonster = new Goblin();
+                newMonster->SetPosition(rx, ry);
+                activeMonsters.push_back(newMonster);
+                _map.SetTile(rx, ry, Tile::Monster);
+
+                spawned++;
+            }
+        }
+    }
+}
 
 void SpawnManager::UpdateCleanup(Map& _map)
 {

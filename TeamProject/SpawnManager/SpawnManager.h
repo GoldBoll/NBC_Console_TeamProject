@@ -8,7 +8,7 @@ class SpawnManager
 {
 private:
     SpawnManager();
-    ~SpawnManager();
+    
 
     SpawnManager(const SpawnManager&) = delete;
     SpawnManager& operator=(const SpawnManager&) = delete;
@@ -21,8 +21,10 @@ public:
         static SpawnManager instance;
         return &instance;
     }
+    ~SpawnManager();
 
-    //void SpawnMonstersInRooms(Map& _map, std::vector<Room>& roomList);
+    const std::vector<Monster*>& GetActiveMonsters() const;
+    void SpawnMonstersInRooms(Map& _map, const std::vector<Room>& roomList);
     void UpdateCleanup(Map& _map);
 };
 
