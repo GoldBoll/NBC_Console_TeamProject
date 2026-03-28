@@ -96,7 +96,7 @@ void Render::RenderHelp()
     ResetColor();
 }
 
-void Render::RenderMap(const Map& map, const Player* player)
+void Render::RenderMap(const Map& map, const Player* player, const std::vector<Monster*>& monsters)
 {
     int camX = std::max(0, std::min(player->GetX() - VIEW_W / 2, MAP_W - VIEW_W));
     int camY = std::max(0, std::min(player->GetY() - VIEW_H / 2, MAP_H - VIEW_H));
