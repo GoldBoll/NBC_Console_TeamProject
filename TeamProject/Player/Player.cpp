@@ -1,5 +1,7 @@
 ﻿#include "Player.h"
-#include <iostream>
+#include "../Monster/Monster.h"
+#include "../Render/Render.h"
+#include <algorithm>
 
 Player::Player(std::string _jobName)
 {
@@ -80,3 +82,30 @@ void Player::TakeDamage(int _damage)
 }
 
 Player::~Player() { }
+
+void Player::DetectMonsters(std::vector<Monster*>& _monsters)
+{
+    for (Monster* monster : _monsters)
+    {
+        if (monster == nullptr) continue;
+
+        MonsterState oldState = monster->GetState();
+        int dist = std::max(std::abs(x - monster->GetX()), std::abs(y - monster->GetY()));
+
+        if (dist <= combatRange)      monster->SetState(MonsterState::COMBAT);
+        else if (dist <= chaseRange) monster->SetState(MonsterState::CHASE);
+        else                          monster->SetState(MonsterState::IDLE);
+
+        MonsterState newState = monster->GetState();
+
+        if (oldState != newState)
+        {
+            if (newState == MonsterState::CHASE)
+                Render::GetInstance().AddLog(monster->GetName() + "가 당신을 발견했습니다!", CLR_YELLOW);
+            else if (newState == MonsterState::COMBAT)
+                Render::GetInstance().AddLog(monster->GetName() + "와 전투를 시작합니다!", CLR_RED);
+            else if (newState == MonsterState::IDLE && oldState != MonsterState::IDLE)
+                Render::GetInstance().AddLog(monster->GetName() + "가 추적을 포기했습니다.", CLR_DARK_GRAY);
+        }
+    }
+}

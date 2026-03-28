@@ -12,6 +12,9 @@ protected:
     // 위치
     int x = 0, y = 0;
 
+    int combatRange = 2;
+    int chaseRange = 4;
+
     // status
     std::string jobName;
     int hp;
@@ -70,4 +73,6 @@ public:
     void GainExp(int _exp);
     void LevelUp();
     void TakeDamage(int _damage);
+
+    void DetectMonsters(std::vector<Monster*>& _monsters);
 };
