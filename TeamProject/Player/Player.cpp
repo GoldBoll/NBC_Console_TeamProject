@@ -115,24 +115,24 @@ void Player::Move(GameAction _action, Map& _map)
     switch (_action)
     {
     case GameAction::MoveUp:
-        ObjectCheck(0, -1, _map);
+        TileCheck(0, -1, _map);
         break;
 
     case GameAction::MoveDown:
-        ObjectCheck(0, 1, _map);
+        TileCheck(0, 1, _map);
         break;
 
     case GameAction::MoveLeft:
-        ObjectCheck(-1, 0, _map);
+        TileCheck(-1, 0, _map);
         break;
 
     case GameAction::MoveRight:
-        ObjectCheck(1, 0, _map);
+        TileCheck(1, 0, _map);
         break;
     }
 }
 
-bool Player::ObjectCheck(int _x, int _y, Map& _map)
+bool Player::TileCheck(int _x, int _y, Map& _map)
 {
     int nextX = x + _x;
     int nextY = y + _y;
