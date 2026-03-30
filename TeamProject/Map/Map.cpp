@@ -20,6 +20,7 @@ char Map::TileToChar(int x, int y) const
 {
     switch (tiles[y][x])
     {
+        case Tile::Player:       return '@';  // 플레이어
         case Tile::Floor:        return ' ';  // 빈 공간 (투명)
         case Tile::Wall:         return '#';  // 벽
         case Tile::Rock:         return 'R';  // 바위

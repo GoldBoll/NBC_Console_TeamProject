@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "../GameManager/InputManager.h"
 
 struct Map;
 struct Monster;
@@ -75,4 +76,6 @@ public:
     void TakeDamage(int _damage);
 
     void DetectMonsters(std::vector<Monster*>& _monsters);
+    void Move(GameAction action, Map& _map);
+    bool TileCheck(int _x, int _y, Map& _map);
 };

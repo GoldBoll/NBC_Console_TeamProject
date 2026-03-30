@@ -37,6 +37,7 @@ struct Room
 // 타일 타입
 enum class Tile
 {
+    Player,         // '@'  플레이어
     Floor,          // ' '  빈 공간 (투명 처리, 이동 가능)
     Wall,           // '#'  벽 (이동 불가)
     Rock,           // 'R'  바위 - 좁은 장애물 (이동 불가)

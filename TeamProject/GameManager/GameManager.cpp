@@ -116,45 +116,35 @@ void GameManager::Run()
 void GameManager::HandleAction(GameAction action)
 {
     Render& render = Render::GetInstance();
-    bool moved = false;
-    
+
     switch (action)
     {
         case GameAction::MoveUp:
         render.AddLog("moved up",    CLR_DARK_GRAY);
-        player->SetY(player->GetY() - 1);
-        needsRedraw = true;
-        moved = true;
+        player->Move(action, map);
         inputbutton = true;
         break;
         
         case GameAction::MoveDown:
         render.AddLog("moved down",  CLR_DARK_GRAY);
-        player->SetY(player->GetY() + 1);
-        needsRedraw = true;
-        moved = true;
+        player->Move(action, map);
         inputbutton = true;
         break;
         
         case GameAction::MoveLeft:
         render.AddLog("moved left",  CLR_DARK_GRAY);
-        player->SetX(player->GetX() - 1);
-        needsRedraw = true;
-        moved = true;
+        player->Move(action, map);
         inputbutton = true;
         break;
         
         case GameAction::MoveRight:
         render.AddLog("moved right", CLR_DARK_GRAY);
-        player->SetX(player->GetX() + 1);
-        needsRedraw = true;
-        moved = true;
+        player->Move(action, map);
         inputbutton = true;
         break;
         
         case GameAction::Help:
         render.AddLog("WASD/arrows: move  |  h: help  |  q: quit", CLR_CYAN);
-        needsRedraw = true;
         break;
         
         case GameAction::Quit:
