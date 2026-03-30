@@ -42,20 +42,15 @@ void GameManager::Init()
 
     const std::vector<Room>& rooms = BspManager::GetInstance().GetRooms();
 
-    // 플레이어 스폰: 첫 번째 방 중앙
-    if (!rooms.empty())
-    {
-        player->SetX(rooms.front().CenterX());
-        player->SetY(rooms.front().CenterY());
-    }
+    // 플레이어 스폰
+    SpawnManager::GetInstance()->SpawnPlayerInRooms(map, rooms, player);
 
-    // 계단: 마지막 방 중앙
-    if (rooms.size() >= 2)
-    {
-        map.SetTile(rooms.back().CenterX(), rooms.back().CenterY(), Tile::Stair);
-    }
+    // 오브젝트 스폰
+    SpawnManager::GetInstance()->SpawnObjectInRooms(map, rooms);
 
+    // 몬스터 스폰
     SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms);
+    // 몬스터 목록 가져오기
     monsters = SpawnManager::GetInstance()->GetActiveMonsters();
 
     render.DrawStaticUI();
