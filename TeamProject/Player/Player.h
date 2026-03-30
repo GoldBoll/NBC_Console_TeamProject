@@ -3,9 +3,11 @@
 #include <vector>
 #include <iostream>
 #include "../GameManager/InputManager.h"
+#include "../Map/Map.h"
 
 struct Map;
 struct Monster;
+enum class Tile;
 
 class Player
 {
@@ -78,4 +80,5 @@ public:
     void DetectMonsters(std::vector<Monster*>& _monsters);
     void Move(GameAction action, Map& _map);
     bool TileCheck(int _x, int _y, Map& _map);
+    void OnCollision(Tile targetTile);
 };

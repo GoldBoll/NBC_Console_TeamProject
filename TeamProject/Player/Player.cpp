@@ -150,3 +150,25 @@ bool Player::TileCheck(int _x, int _y, Map& _map)
 
     else return false;
 }
+
+void Player::OnCollision(Tile targetTile)
+{
+    switch (targetTile)
+    {
+    case Tile::Monster:
+        // 배틀 매니저
+        break;
+    case Tile::EliteMonster:
+        // 배틀 매니저
+        break;
+    case Tile::Boss:
+        // 배틀 매니저
+        break;
+    case Tile::Chest:
+        // 아이템 매니저
+        break;
+    case Tile::Stair:
+        // 다음 층이동
+        break;
+    }
+}
