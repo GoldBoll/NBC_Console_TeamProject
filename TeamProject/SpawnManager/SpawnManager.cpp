@@ -96,3 +96,38 @@ void SpawnManager::UpdateCleanup(Map& _map)
         }
     }
 }
+
+void SpawnManager::SpawnPlayerInRooms(Map& _map, const std::vector<Room>& _roomList, Player* player)
+{
+    for (const auto& room : _roomList)
+    {
+        if (room.type == RoomType::Start)
+        {
+            player->SetX(room.CenterX());
+            player->SetY(room.CenterY());
+        }
+    }
+}
+
+void SpawnManager::SpawnObjectInRooms(Map& _map, const std::vector<Room>& _roomList)
+{
+    for (const auto& room : _roomList)
+    {
+        int rx = room.CenterX();
+        int ry = room.CenterY();
+        if (room.type == RoomType::Treasure)
+        {
+            if (_map.GetTile(rx, ry) == Tile::Floor)
+            {
+                _map.SetTile(rx, ry, Tile::Chest);
+            }
+        }
+        else if (room.type == RoomType::Stair)
+        {
+            if (_map.GetTile(rx, ry) == Tile::Floor)
+            {
+                _map.SetTile(rx, ry, Tile::Stair);
+            }
+        }
+    }
+}

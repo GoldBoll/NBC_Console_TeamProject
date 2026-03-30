@@ -25,6 +25,10 @@ private:
     void UpdateMonster();
     void ProcessBattle();
 
+    void OpenInventory();
+    void CloseInventory();
+    void HandleInventoryAction(GameAction action);
+
     Map                  map;
     Player*              player;
     std::vector<Monster*> monsters;
@@ -35,4 +39,7 @@ private:
     bool                 isNextMoveDash = false;
     Monster*             battleTarget = nullptr;
     Battle               battle;
+    bool                inventoryOpen    = false;
+    int                 invSelectedIdx   = 0;
+    int                 invScrollOffset  = 0;
 };

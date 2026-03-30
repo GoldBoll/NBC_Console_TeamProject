@@ -13,6 +13,8 @@ enum class GameAction
     Dash,
     Help,
     Quit,
+    Inventory,
+    UseItem,
 };
 
 class InputManager

@@ -221,9 +221,13 @@
     <ClInclude Include="Battle\Battle.h" />
     <ClInclude Include="BspManager\BspManager.h" />
     <ClInclude Include="GameManager\GameManager.h" />
+    <ClInclude Include="Item\Food.h" />
+    <ClInclude Include="Item\HealPotion.h" />
     <ClInclude Include="Item\Inventory.h" />
+    <ClInclude Include="Item\InvisibilityItem.h" />
     <ClInclude Include="GameManager\InputManager.h" />
     <ClInclude Include="Item\Item.h" />
+    <ClInclude Include="Item\TeleportPotion.h" />
     <ClInclude Include="Map\Map.h" />
     <ClInclude Include="Monster\Goblin.h" />
     <ClInclude Include="Monster\Golem.h" />

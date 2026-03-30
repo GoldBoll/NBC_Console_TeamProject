@@ -160,3 +160,66 @@ bool Player::Attack(Monster* target)
         return false;
     }
 }
+
+void Player::Move(GameAction _action, Map& _map)
+{
+    switch (_action)
+    {
+    case GameAction::MoveUp:
+        TileCheck(0, -1, _map);
+        break;
+
+    case GameAction::MoveDown:
+        TileCheck(0, 1, _map);
+        break;
+
+    case GameAction::MoveLeft:
+        TileCheck(-1, 0, _map);
+        break;
+
+    case GameAction::MoveRight:
+        TileCheck(1, 0, _map);
+        break;
+    }
+}
+
+bool Player::TileCheck(int _x, int _y, Map& _map)
+{
+    int nextX = x + _x;
+    int nextY = y + _y;
+
+    if (_map.GetTile(nextX, nextY) == Tile::Floor)
+    {
+        _map.SetTile(x, y, Tile::Floor);
+
+        x = nextX;
+        y = nextY;
+
+        _map.SetTile(x, y, Tile::Player);
+        return true;
+    }
+
+    else return false;
+}
+
+void Player::OnCollision(Tile targetTile)
+{
+    switch (targetTile)
+    {
+    case Tile::Monster:
+        // 배틀 매니저
+        break;
+    case Tile::EliteMonster:
+        // 배틀 매니저
+        break;
+    case Tile::Boss:
+        // 배틀 매니저
+        break;
+    case Tile::Chest:
+        // 아이템 매니저
+        break;
+    case Tile::Stair:
+        // 다음 층이동
+        break;
+    }
+}

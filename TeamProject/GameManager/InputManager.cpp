@@ -25,8 +25,6 @@ void InputManager::SetupDefaultBindings()
 
     keyMap['q'] = GameAction::Quit;
     keyMap['Q'] = GameAction::Quit;
-    BindKey('i', GameAction::Help);
-    BindKey('q', GameAction::Quit);
 
     // Battle Actions
     BindKey('1', GameAction::Action1);
@@ -34,6 +32,11 @@ void InputManager::SetupDefaultBindings()
 
     // Exploration Actions
     BindKey('`', GameAction::Dash);
+    keyMap['h'] = GameAction::Help;
+    keyMap['H'] = GameAction::Help;
+    keyMap['i'] = GameAction::Inventory;
+    keyMap['I'] = GameAction::Inventory;
+    keyMap[' '] = GameAction::UseItem;
 
     specialKeyMap[72] = GameAction::MoveUp;
     specialKeyMap[80] = GameAction::MoveDown;

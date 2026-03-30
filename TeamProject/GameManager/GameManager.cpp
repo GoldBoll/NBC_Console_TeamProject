@@ -6,6 +6,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
+#include "../Item/HealPotion.h"
+#include "../Item/InvisibilityItem.h"
+#include "../Item/TeleportPotion.h"
 #include "../SpawnManager/SpawnManager.h"
 
 // 수동 클램프 함수
@@ -35,6 +38,11 @@ void GameManager::Init()
     Render& render = Render::GetInstance();
     render.Init("TextRPG - NBC Team Project 2");
 
+    //아이템 출력확인
+    player->GetInventory().AddItem(new HealPotion());
+    player->GetInventory().AddItem(new InvisibilityItem());
+    player->GetInventory().AddItem(new TeleportPotion());
+
     // BSP 맵 생성
     BspManager::Params bspParams;
     BspManager::GetInstance().Generate(map, bspParams);
@@ -42,20 +50,14 @@ void GameManager::Init()
     const std::vector<Room>& rooms = BspManager::GetInstance().GetRooms();
 
     // 플레이어 스폰
-    if (!rooms.empty())
-    {
-        player->SetX(rooms.front().CenterX());
-        player->SetY(rooms.front().CenterY());
-    }
+    SpawnManager::GetInstance()->SpawnPlayerInRooms(map, rooms, player);
 
-    // 계단
-    if (rooms.size() >= 2)
-    {
-        map.SetTile(rooms.back().CenterX(), rooms.back().CenterY(), Tile::Stair);
-    }
+    // 오브젝트 스폰
+    SpawnManager::GetInstance()->SpawnObjectInRooms(map, rooms);
 
-    // 몬스터 스폰 (스냅샷 생성 전 수행)
+    // 몬스터 스폰
     SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms, player->GetX(), player->GetY());
+    // 몬스터 목록 가져오기
     monsters = SpawnManager::GetInstance()->GetActiveMonsters();
 
     render.DrawStaticUI();
@@ -64,11 +66,28 @@ void GameManager::Init()
     render.AddLog("게임이 시작되었습니다!", CLR_YELLOW);
     render.AddLog("WASD: 이동  |  `: 대쉬 활성화", CLR_GRAY);
 
-    running      = true;
-    needsRedraw  = true;
-    isBattleMode = false;
-    inputbutton  = false;
+    running        = true;
+    needsRedraw    = true;
+    isBattleMode   = false;
+    inputbutton    = false;
     isNextMoveDash = false;
+
+    render.RenderMap(map, player, monsters);
+    render.RenderInfo(player);
+    render.RenderLog();
+    /*for (int y = 0; y < MAP_H; ++y)
+    {
+        for (int x = 0; x < MAP_W; ++x)
+        {
+            if (map.GetTile(x, y) == Tile::Monster)
+            {
+                Monster* monster = new Monster("Slime", 10, 1, 1, 10);
+                monster->SetPosition(x, y);
+                monsters.push_back(monster);
+                map.SetTile(x, y, Tile::Floor);
+            }
+        }
+    }*/
 }
 
 void GameManager::Run()
@@ -289,4 +308,86 @@ void GameManager::ProcessBattle()
             break;
         }
     }
+}
+
+void GameManager::OpenInventory()
+{
+    inventoryOpen   = true;
+    invSelectedIdx  = 0;
+    invScrollOffset = 0;
+
+    Render& render = Render::GetInstance();
+    render.RenderInventory(player->GetInventory(), invSelectedIdx, invScrollOffset);
+
+    auto items = player->GetInventory().GetFilledItems();
+    const Item* sel = items.empty() ? nullptr : items[0].second;
+    render.RenderItemDesc(sel);
+}
+
+void GameManager::CloseInventory()
+{
+    inventoryOpen   = false;
+    invSelectedIdx  = 0;
+    invScrollOffset = 0;
+
+    Render& render = Render::GetInstance();
+    render.RenderInfo(player);
+    render.ClearInfo2();
+}
+
+void GameManager::HandleInventoryAction(GameAction action)
+{
+    Render& render  = Render::GetInstance();
+    const int maxVisible = PLAYER_INFO_H - 4;
+    auto items = player->GetInventory().GetFilledItems();
+
+    switch (action)
+    {
+    case GameAction::MoveUp:
+        if (invSelectedIdx > 0)
+        {
+            --invSelectedIdx;
+            if (invSelectedIdx < invScrollOffset)
+                --invScrollOffset;
+        }
+        break;
+
+    case GameAction::MoveDown:
+        if (invSelectedIdx < (int)items.size() - 1)
+        {
+            ++invSelectedIdx;
+            if (invSelectedIdx >= invScrollOffset + maxVisible)
+                ++invScrollOffset;
+        }
+        break;
+
+    case GameAction::UseItem:
+        if (!items.empty() && invSelectedIdx < (int)items.size())
+        {
+            int   slotIdx  = items[invSelectedIdx].first;
+            std::string itemName = items[invSelectedIdx].second->GetName();
+            player->GetInventory().UseItem(slotIdx, *player);
+            render.AddLog("Used: " + itemName, CLR_GREEN);
+
+            // 소모 후 선택 인덱스 보정
+            auto updated = player->GetInventory().GetFilledItems();
+            if (invSelectedIdx >= (int)updated.size())
+                invSelectedIdx = (int)updated.size() - 1;
+            if (invSelectedIdx < 0) invSelectedIdx = 0;
+            if (invScrollOffset > invSelectedIdx)
+                invScrollOffset = invSelectedIdx;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    // 패널 갱신
+    auto updated = player->GetInventory().GetFilledItems();
+    render.RenderInventory(player->GetInventory(), invSelectedIdx, invScrollOffset);
+    const Item* sel = (!updated.empty() && invSelectedIdx < (int)updated.size())
+        ? updated[invSelectedIdx].second : nullptr;
+    render.RenderItemDesc(sel);
+    render.RenderLog();
 }

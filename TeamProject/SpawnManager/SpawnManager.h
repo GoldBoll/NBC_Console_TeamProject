@@ -26,4 +26,6 @@ public:
     const std::vector<Monster*>& GetActiveMonsters() const;
     void SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _rooms, int playerX, int playerY);
     void UpdateCleanup(Map& _map);
+    void SpawnPlayerInRooms(Map& _map, const std::vector<Room>& _roomList, Player* player);
+    void SpawnObjectInRooms(Map& _map, const std::vector<Room>& _roomList);
 };

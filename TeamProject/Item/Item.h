@@ -1,6 +1,8 @@
-﻿#pragma once
+#pragma once
 #include <string>
 #include <iostream>
+
+class Player;
 
 enum class ItemType
 {
@@ -12,29 +14,17 @@ struct Item
 {
     int itemCode;
     std::string name;
+    std::string description;
     ItemType type;
     bool isConsumable;
 
-    Item(int code, std::string n, ItemType t, bool consuable)
-        : itemCode(code), name(n), type(t), isConsumable(consuable) {}
+    Item(int code, std::string n, std::string desc, ItemType t, bool consumable)
+        : itemCode(code), name(n), description(desc), type(t), isConsumable(consumable) {}
 
     virtual ~Item() {}
 
-    std::string GetName() const { return name; }
+    std::string GetName()        const { return name; }
+    std::string GetDescription() const { return description; }
 
-    void Use()
-    {
-        if (type == ItemType::WEAPON)
-        {
-            std::cout << "무기를 휘두릅니다." << std::endl;
-        }
-        else if (type == ItemType::POTION)
-        {
-            std::cout << "물약을 마십니다." << std::endl;
-        }
-        else if (type == ItemType::ETC)
-        {
-            std::cout << "사용할 수 없습니다." << std::endl;
-        }
-    }
+    virtual void Use(Player& player) {}
 };

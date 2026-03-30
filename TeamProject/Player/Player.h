@@ -2,10 +2,14 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "../GameManager/InputManager.h"
+#include "../Item/Inventory.h"
+#include "../Map/Map.h"
 
 struct Map;
 
 class Monster;
+enum class Tile;
 
 class Player
 {
@@ -36,7 +40,7 @@ protected:
     int dexBonus;
     int hpBonus;
 
-    // Inventory            inventory;
+    Inventory            inventory;
     // vector<StatusEffect> statusEffects;
 
     int dashGauge = 0;
@@ -54,6 +58,9 @@ public:
     //virtual void attack(Monster* monster) = 0;
 
     // Getter
+    Inventory&       GetInventory()       { return inventory; }
+    const Inventory& GetInventory() const { return inventory; }
+
     std::string GetJobName() const { return jobName; }
     int GetLevel()     const { return level; }
     int GetHP()        const { return hp; }
@@ -90,4 +97,8 @@ public:
     int GetDashGauge() const { return dashGauge; }
 
     bool Attack(Monster* target);
+    void DetectMonsters(std::vector<Monster*>& _monsters);
+    void Move(GameAction action, Map& _map);
+    bool TileCheck(int _x, int _y, Map& _map);
+    void OnCollision(Tile targetTile);
 };
