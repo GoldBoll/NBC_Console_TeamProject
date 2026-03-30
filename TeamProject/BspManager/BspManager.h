@@ -47,6 +47,12 @@ public:
 
         // 랜덤 시드 (0 이면 time(nullptr) 로 자동 설정)
         unsigned seed = 0;
+
+        // 방 타입별 개수 (Start·Stair 는 항상 1개 고정, 합이 전체 방 수를 초과하면 클램프됨)
+        // 남은 방은 모두 Normal 로 배정됩니다.
+        int bossRoomCount     = 1;
+        int eliteRoomCount    = 2;
+        int treasureRoomCount = 2;
     };
 
     static BspManager& GetInstance();
@@ -88,6 +94,7 @@ private:
     void         BuildRoomSnapshot(const Map& map, bool out[][MAP_W]);
     void         DilateCorridor(Map& map, const bool roomSnapshot[][MAP_W]);
     void         MarkDebugRoomWalls(Map& map);
+    void         AssignRoomTypes(const Params& p);
     void         FreeTree(BspNode* node);
 
     BspNode*          root = nullptr;

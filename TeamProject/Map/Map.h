@@ -13,10 +13,22 @@ constexpr int MAP_H = 100;
 constexpr int STAGE1_START_X = MAP_W / 2;
 constexpr int STAGE1_START_Y = MAP_H / 2;
 
+// 방 타입 (BspManager 가 랜덤 배정, SpawnManager 가 스폰 분기에 사용)
+enum class RoomType
+{
+    Start,      // 시작방 - 스폰 없음 (항상 첫 번째 방)
+    Normal,     // 일반 몬스터 (Goblin, Orc)
+    Elite,      // 엘리트 몬스터 (Golem)
+    Boss,       // 보스방 - 강한 몬스터 1마리
+    Treasure,   // 보물상자 배치
+    Stair,      // 계단 배치 (항상 마지막 방)
+};
+
 // BSP 로 생성된 방 정보 (BspManager 가 채워주고, SpawnManager/GameManager 가 읽음)
 struct Room
 {
     int x, y, w, h;                          // Floor 영역의 좌상단 좌표 및 크기
+    RoomType type = RoomType::Normal;               // 방 타입 (BspManager::Generate 후 확정)
     int CenterX() const { return x + w / 2; }
     int CenterY() const { return y + h / 2; }
 };
