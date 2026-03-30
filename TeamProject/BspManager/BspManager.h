@@ -19,6 +19,11 @@
 //      // rooms.back() : 계단/보스 스폰 추천
 // ─────────────────────────────────────────────────────────────────────────────
 
+//현재 이슈
+//복도와 방의 경계가 곂치는문제
+//DilateCorridor 가 roomSnapshot으로 방을체크해서 복도를 확장하긴하지만 분리필요
+//복도를 어떤방이랑 이을지 조건이 모호함
+
 class BspManager
 {
 public:
@@ -58,21 +63,32 @@ public:
 private:
     BspManager() = default;
 
+    // ConnectTree 반환용: 복도 꺾임점(elbow) 좌표
+    struct ConnectPoint { int x = 0, y = 0; };
+
     struct BspNode
     {
         int      x, y, w, h;
         BspNode* left  = nullptr;
         BspNode* right = nullptr;
-        Room     room  = {};          // leaf 노드에서만 유효
+        Room     room  = {};             // leaf 노드에서만 유효
+        int      junctionX    = 0;       // 이 노드가 만든 복도 spine 진입점 X
+        int      junctionY    = 0;       // 이 노드가 만든 복도 spine 진입점 Y
+        bool     hasJunction  = false;
+        bool     splitVertical = false;  // 수직 분할(좌|우)이면 true, 수평(상|하)이면 false
         bool     IsLeaf() const { return !left && !right; }
     };
 
-    BspNode* BuildTree(int x, int y, int w, int h, int depth);
-    void     CarveRooms(BspNode* node, Map& map);
-    Room     ConnectTree(BspNode* node, Map& map);  // 재귀 연결 후 대표 방 반환
-    void     HCorridor(Map& map, int x1, int x2, int y);
-    void     VCorridor(Map& map, int x,  int y1, int y2);
-    void     FreeTree(BspNode* node);
+    BspNode*     BuildTree(int x, int y, int w, int h, int depth);
+    void         CarveRooms(BspNode* node, Map& map);
+    ConnectPoint ConnectTree(BspNode* node, Map& map);
+    void         HCorridor(Map& map, int startCol, int endCol, int row);
+    void         VCorridor(Map& map, int col,      int startRow, int endRow);
+    // roomSnapshot: CarveRooms 직후 Floor 여부 스냅샷 (복도와 방 구분용)
+    void         BuildRoomSnapshot(const Map& map, bool out[][MAP_W]);
+    void         DilateCorridor(Map& map, const bool roomSnapshot[][MAP_W]);
+    void         MarkDebugRoomWalls(Map& map);
+    void         FreeTree(BspNode* node);
 
     BspNode*          root = nullptr;
     std::vector<Room> rooms;

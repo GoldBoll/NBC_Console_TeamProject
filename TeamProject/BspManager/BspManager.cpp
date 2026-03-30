@@ -1,4 +1,4 @@
-﻿#include "BspManager.h"
+#include "BspManager.h"
 #include <ctime>
 #include <algorithm>
 
@@ -20,13 +20,25 @@ void BspManager::Generate(Map& map, const Params& p)
     root = nullptr;
     rooms.clear();
 
-    // ① 전체 Wall 로 초기화 (BSP 는 Wall 에서 깎아내는 방식)
+    // 전체 Wall 로 초기화 (BSP 는 Wall 에서 깎아내는 방식)
     map.Fill(Tile::Wall);
 
-    // ② 트리 빌드 → 방 조각 → 복도 연결
+    // 트리 빌드 → 방 조각
     root = BuildTree(0, 0, MAP_W, MAP_H, 0);
     CarveRooms(root, map);
+
+    // 방 타일 스냅샷: 복도 팽창 시 방과 복도를 구분하기 위해 저장
+    bool roomSnapshot[MAP_H][MAP_W] = {};
+    BuildRoomSnapshot(map, roomSnapshot);
+
+    // 1칸 너비 복도 중심선 연결 (Z자형)
     ConnectTree(root, map);
+
+    // 복도 중심선을 4방향 팽창 → 3칸 너비로 확장
+    DilateCorridor(map, roomSnapshot);
+
+    // 디버그: 방 경계 벽 마킹 (복도 벽과 색상 구분용)
+    MarkDebugRoomWalls(map);
 }
 
 //  BuildTree : 파티션을 재귀 분할해 BSP 트리 생성
@@ -36,7 +48,7 @@ BspManager::BspNode* BspManager::BuildTree(int x, int y, int w, int h, int depth
 
     bool canSplitW = (w >= curParams.minPartitionW * 2);  // 좌우 분할 가능 여부
     bool canSplitH = (h >= curParams.minPartitionH * 2);  // 상하 분할 가능 여부
-    
+
     if (depth >= curParams.maxDepth || (!canSplitW && !canSplitH))
         return node;   // leaf
 
@@ -46,6 +58,8 @@ BspManager::BspNode* BspManager::BuildTree(int x, int y, int w, int h, int depth
         splitVertical = (rng() % 2) == 0;
     else
         splitVertical = canSplitW;
+
+    node->splitVertical = splitVertical;  // ConnectTree 에서 분할 방향 참조
 
     if (splitVertical)
     {
@@ -116,48 +130,143 @@ void BspManager::CarveRooms(BspNode* node, Map& map)
     CarveRooms(node->right, map);
 }
 
-//  ConnectTree : 형제 방을 L자형 복도(3칸 너비)로 연결 (bottom-up)
-//  반환값: 이 서브트리를 대표하는 방 (상위 연결에 사용)
-Room BspManager::ConnectTree(BspNode* node, Map& map)
+//  ConnectTree : 파티션 경계(spine)를 통해 Z자형 복도 중심선(1칸 너비)을 연결
+BspManager::ConnectPoint BspManager::ConnectTree(BspNode* node, Map& map)
 {
-    if (!node)       return {};
-    if (node->IsLeaf()) return node->room;
+    if (!node)          return {};
+    if (node->IsLeaf()) return { node->room.CenterX(), node->room.CenterY() };
 
-    Room l = ConnectTree(node->left,  map);
-    Room r = ConnectTree(node->right, map);
+    ConnectPoint leftJunction  = ConnectTree(node->left,  map);
+    ConnectPoint rightJunction = ConnectTree(node->right, map);
 
-    // 두 방의 중심을 L자형 복도로 연결
-    // 수평 이동 → 수직 이동
-    int x1 = l.CenterX(), y1 = l.CenterY();
-    int x2 = r.CenterX(), y2 = r.CenterY();
+    if (node->splitVertical)
+    {
+        // 수직 분할(좌|우): H → V → H  Z자형
+        const int spineCol = node->right->x;
 
-    HCorridor(map, x1, x2, y1);
-    VCorridor(map, x2, y1, y2);
+        HCorridor(map, leftJunction.x,  spineCol,        leftJunction.y);
+        VCorridor(map, spineCol,         leftJunction.y,  rightJunction.y);
+        HCorridor(map, spineCol,         rightJunction.x, rightJunction.y);
 
-    // 부모가 연결할 때 사용할 대표 방 하나를 랜덤 반환
-    return (rng() % 2) ? l : r;
+        node->junctionX   = spineCol;
+        node->junctionY   = leftJunction.y;
+        node->hasJunction = true;
+
+        return { spineCol, leftJunction.y };
+    }
+    else
+    {
+        // 수평 분할(상|하): V → H → V  역Z자형
+        const int spineRow = node->right->y;
+
+        VCorridor(map, leftJunction.x,  leftJunction.y,  spineRow);
+        HCorridor(map, leftJunction.x,  rightJunction.x, spineRow);
+        VCorridor(map, rightJunction.x, spineRow,         rightJunction.y);
+
+        node->junctionX   = leftJunction.x;
+        node->junctionY   = spineRow;
+        node->hasJunction = true;
+
+        return { leftJunction.x, spineRow };
+    }
 }
 
-//  HCorridor : y 행에서 x1~x2 구간을 칸 높이 Floor 로 연결
-void BspManager::HCorridor(Map& map, int x1, int x2, int y)
+//  HCorridor : 지정한 행(row)에서 startCol~endCol 구간을 1칸 너비 중심선으로 연결
+void BspManager::HCorridor(Map& map, int startCol, int endCol, int row)
 {
-    int from = std::min(x1, x2);
-    int to = std::max(x1, x2);
-    for (int x = from; x <= to; ++x)
-        for (int dy = -1; dy <= 1; ++dy)        // y-1, y, y+1 (중심기준 ±1)
-            if (map.InBounds(x, y + dy))
-                map.SetTile(x, y + dy, Tile::Floor);
+    int leftCol  = std::min(startCol, endCol);
+    int rightCol = std::max(startCol, endCol);
+    for (int col = leftCol; col <= rightCol; ++col)
+        if (map.InBounds(col, row))
+            map.SetTile(col, row, Tile::Floor);
 }
 
-//  VCorridor : x 열에서 y1~y2 구간을 2칸 너비 Floor 로 연결
-void BspManager::VCorridor(Map& map, int x, int y1, int y2)
+//  VCorridor : 지정한 열(col)에서 startRow~endRow 구간을 1칸 너비 중심선으로 연결
+void BspManager::VCorridor(Map& map, int col, int startRow, int endRow)
 {
-    int from = std::min(y1, y2);
-    int to = std::max(y1, y2);
-    for (int y = from; y <= to; ++y)
-        for (int dx = -1; dx <= 1; ++dx)        // x-1, x, x+1 (중심기준 ±1)
-            if (map.InBounds(x + dx, y))
-                map.SetTile(x + dx, y, Tile::Floor);
+    int topRow    = std::min(startRow, endRow);
+    int bottomRow = std::max(startRow, endRow);
+    for (int row = topRow; row <= bottomRow; ++row)
+        if (map.InBounds(col, row))
+            map.SetTile(col, row, Tile::Floor);
+}
+
+void BspManager::BuildRoomSnapshot(const Map& map, bool out[][MAP_W])
+{
+    for (int y = 0; y < MAP_H; ++y)
+        for (int x = 0; x < MAP_W; ++x)
+            out[y][x] = (map.GetTile(x, y) == Tile::Floor);
+}
+
+//  DilateCorridor : 복도 중심선(1칸)을 4방향으로 1칸씩 팽창 → 총 3칸 너비로 확장
+void BspManager::DilateCorridor(Map& map, const bool roomSnapshot[][MAP_W])
+{
+    constexpr int NEIGHBOR_DX[] = { -1, 1,  0, 0 };
+    constexpr int NEIGHBOR_DY[] = {  0, 0, -1, 1 };
+
+    // 팽창할 좌표를 수집 (순회 중 맵을 수정하면 결과가 달라지므로 분리)
+    bool toExpand[MAP_H][MAP_W] = {};
+
+    for (int y = 0; y < MAP_H; ++y)
+    {
+        for (int x = 0; x < MAP_W; ++x)
+        {
+            // 복도 중심선 타일: Floor 이면서 방이 아닌 것
+            const bool isCorridorCenter =
+                (map.GetTile(x, y) == Tile::Floor) && !roomSnapshot[y][x];
+
+            if (isCorridorCenter)
+            {
+                for (int d = 0; d < 4; ++d)
+                {
+                    int nx = x + NEIGHBOR_DX[d];
+                    int ny = y + NEIGHBOR_DY[d];
+                    if (map.InBounds(nx, ny))
+                        toExpand[ny][nx] = true;
+                }
+            }
+        }
+    }
+
+    // 수집된 위치 중 Wall 타일만 Floor 로 변환
+    for (int y = 0; y < MAP_H; ++y)
+    {
+        for (int x = 0; x < MAP_W; ++x)
+        {
+            if (toExpand[y][x] && map.GetTile(x, y) == Tile::Wall)
+            {
+                map.SetTile(x, y, Tile::Floor);
+            }
+        }
+    }
+}
+
+void BspManager::MarkDebugRoomWalls(Map& map)
+{
+    map.ClearDebugRoomWall();
+    for (const Room& room : rooms)
+    {
+        // 상단/하단 행 전체 (모서리 포함)
+        for (int x = room.x - 1; x <= room.x + room.w; ++x)
+        {
+            const int topRow    = room.y - 1;
+            const int bottomRow = room.y + room.h;
+            if (map.InBounds(x, topRow)    && map.GetTile(x, topRow)    == Tile::Wall)
+                map.SetDebugRoomWall(x, topRow, true);
+            if (map.InBounds(x, bottomRow) && map.GetTile(x, bottomRow) == Tile::Wall)
+                map.SetDebugRoomWall(x, bottomRow, true);
+        }
+        // 좌측/우측 열 (상하 모서리 제외 — 위에서 이미 처리)
+        for (int y = room.y; y < room.y + room.h; ++y)
+        {
+            const int leftCol  = room.x - 1;
+            const int rightCol = room.x + room.w;
+            if (map.InBounds(leftCol,  y) && map.GetTile(leftCol,  y) == Tile::Wall)
+                map.SetDebugRoomWall(leftCol, y, true);
+            if (map.InBounds(rightCol, y) && map.GetTile(rightCol, y) == Tile::Wall)
+                map.SetDebugRoomWall(rightCol, y, true);
+        }
+    }
 }
 
 void BspManager::FreeTree(BspNode* node)
