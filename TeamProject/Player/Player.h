@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "../GameManager/InputManager.h"
+#include "../Item/Inventory.h"
 
 struct Map;
 struct Monster;
@@ -34,7 +35,7 @@ protected:
     int dexBonus;
     int hpBonus;
 
-    // Inventory            inventory;
+    Inventory            inventory;
     // vector<StatusEffect> statusEffects;
 
 public:
@@ -48,6 +49,9 @@ public:
     //virtual void attack(Monster* monster) = 0;
 
     // Getter
+    Inventory&       GetInventory()       { return inventory; }
+    const Inventory& GetInventory() const { return inventory; }
+
     std::string GetJobName() const { return jobName; }
     int GetLevel()     const { return level; }
     int GetHP()        const { return hp; }

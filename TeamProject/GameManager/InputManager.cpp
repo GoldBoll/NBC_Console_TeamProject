@@ -27,6 +27,9 @@ void InputManager::SetupDefaultBindings()
     keyMap['Q'] = GameAction::Quit;
     keyMap['h'] = GameAction::Help;
     keyMap['H'] = GameAction::Help;
+    keyMap['i'] = GameAction::Inventory;
+    keyMap['I'] = GameAction::Inventory;
+    keyMap[' '] = GameAction::UseItem;
 
     specialKeyMap[72] = GameAction::MoveUp;
     specialKeyMap[80] = GameAction::MoveDown;

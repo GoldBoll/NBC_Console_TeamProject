@@ -10,6 +10,8 @@ enum class GameAction
     MoveRight,
     Help,
     Quit,
+    Inventory,
+    UseItem,
 };
 
 class InputManager

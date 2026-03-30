@@ -297,3 +297,98 @@ void Render::DrawBox(int x, int y, int w, int h,
 
     ResetColor();
 }
+
+void Render::RenderInventory(const Inventory& inv, int selectedIdx, int scrollOffset)
+{
+    ClearRegion(PLAYER_INFO_X + 1, PLAYER_INFO_Y + 1, MID_BOX_W - 2, PLAYER_INFO_H - 2);
+
+    const int maxVisible = PLAYER_INFO_H - 4;
+    int y = PLAYER_INFO_Y + 1;
+
+    SetColor(CLR_YELLOW);
+    GotoXY(PLAYER_INFO_X + 1, y++);
+    std::cout << "[ Inventory ]";
+    ++y;
+
+    auto items = inv.GetFilledItems();
+    if (items.empty())
+    {
+        SetColor(CLR_DARK_GRAY);
+        GotoXY(PLAYER_INFO_X + 1, y);
+        std::cout << "(empty)";
+        ResetColor();
+        return;
+    }
+
+    for (int i = 0; i < maxVisible; ++i)
+    {
+        int listIdx = scrollOffset + i;
+        if (listIdx >= (int)items.size()) break;
+
+        GotoXY(PLAYER_INFO_X + 1, y + i);
+        bool selected = (listIdx == selectedIdx);
+
+        if (selected) { SetColor(CLR_WHITE);     std::cout << '>'; SetColor(CLR_YELLOW); }
+        else          { SetColor(CLR_DARK_GRAY); std::cout << ' '; SetColor(CLR_GRAY);   }
+
+        std::string name = items[listIdx].second->GetName();
+        int maxLen = MID_BOX_W - 4;
+        if ((int)name.size() > maxLen) name = name.substr(0, maxLen);
+        std::cout << name;
+    }
+
+    // 스크롤 표시 (아이템이 더 있을 때)
+    if (scrollOffset + maxVisible < (int)items.size())
+    {
+        SetColor(CLR_DARK_GRAY);
+        GotoXY(PLAYER_INFO_X + 1, PLAYER_INFO_Y + PLAYER_INFO_H - 2);
+        std::cout << "v more";
+    }
+
+    ResetColor();
+}
+
+void Render::RenderItemDesc(const Item* item)
+{
+    ClearRegion(INFO2_BOX_X + 1, INFO2_BOX_Y + 1, MID_BOX_W - 2, INFO2_H - 2);
+
+    if (!item) { ResetColor(); return; }
+
+    int y = INFO2_BOX_Y + 1;
+    const int maxW = MID_BOX_W - 2;
+
+    SetColor(CLR_WHITE);
+    GotoXY(INFO2_BOX_X + 1, y++);
+    std::string name = item->GetName();
+    if ((int)name.size() > maxW) name = name.substr(0, maxW);
+    std::cout << name;
+    ++y;
+
+    SetColor(CLR_CYAN);
+    GotoXY(INFO2_BOX_X + 1, y++);
+    switch (item->type)
+    {
+    case ItemType::WEAPON: std::cout << "[WEAPON]"; break;
+    case ItemType::POTION: std::cout << "[POTION]"; break;
+    default:               std::cout << "[ETC]";    break;
+    }
+    ++y;
+
+    SetColor(CLR_GRAY);
+    const std::string& desc = item->GetDescription();
+    int start = 0;
+    int descLen = (int)desc.size();
+    while (start < descLen && y < INFO2_BOX_Y + INFO2_H - 1)
+    {
+        GotoXY(INFO2_BOX_X + 1, y++);
+        std::cout << desc.substr(start, maxW);
+        start += maxW;
+    }
+
+    ResetColor();
+}
+
+void Render::ClearInfo2()
+{
+    ClearRegion(INFO2_BOX_X + 1, INFO2_BOX_Y + 1, MID_BOX_W - 2, INFO2_H - 2);
+}

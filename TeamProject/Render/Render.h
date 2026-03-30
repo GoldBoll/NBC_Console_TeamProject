@@ -5,6 +5,7 @@
 #include <deque>
 #include <utility>
 #include "../Map/Map.h"
+#include "../Item/Inventory.h"
 // UILayout.h 는 Map.h → UILayout.h 경로로 이미 포함됩니다.
 
 // 콘솔 색상 (Windows 16색)
@@ -41,6 +42,9 @@ public:
     void RenderInfo(Player* player);
     void RenderLog();
     void AddLog(const std::string& msg, int color = CLR_GREEN);
+    void RenderInventory(const Inventory& inv, int selectedIdx, int scrollOffset);
+    void RenderItemDesc(const Item* item);
+    void ClearInfo2();
 
     Render(const Render&)            = delete;
     Render& operator=(const Render&) = delete;

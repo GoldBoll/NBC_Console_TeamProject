@@ -24,10 +24,18 @@ private:
     void HandleAction(GameAction action);
     void UpdateMonster();
 
+    void OpenInventory();
+    void CloseInventory();
+    void HandleInventoryAction(GameAction action);
+
     Map                  map;
     Player*              player;
     std::vector<Monster*> monsters;
     bool                 running     = false;
     bool                 needsRedraw = false;
     bool inputbutton = false;
+
+    bool inventoryOpen    = false;
+    int  invSelectedIdx   = 0;
+    int  invScrollOffset  = 0;
 };
