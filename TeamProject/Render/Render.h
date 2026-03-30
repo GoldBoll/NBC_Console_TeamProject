@@ -37,7 +37,7 @@ public:
     void Init(const char* title = "TextRPG");
     void DrawStaticUI();
     void RenderHelp();
-    void RenderMap(const Map& map, const Player* player);
+    void RenderMap(const Map& map, const Player* player, const std::vector<Monster*>& monsters);
     void RenderInfo(Player* player);
     void RenderLog();
     void AddLog(const std::string& msg, int color = CLR_GREEN);

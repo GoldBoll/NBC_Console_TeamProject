@@ -2,21 +2,24 @@
 #include "../Monster/Monster.h"
 #include "../Render/Render.h"
 #include <algorithm>
+#include <cstdlib>
 
 Player::Player(std::string _jobName)
 {
     jobName = _jobName;
-    hp = 10;
-    maxHp = 10;
-    atk = 2;
+    hp = 30;
+    maxHp = 30;
+    atk = 4;
+    def = 0;
     dex = 1;
 
     level = 1;
     exp = 0;
     expToNext = 20;
 
-    maxHpBonus = 2;
-    atkBonus = 3;
+    maxHpBonus = 3;
+    atkBonus = 1;
+    defBonus = 1;
     dexBonus = 1;
     hpBonus = 5;
 }
@@ -25,6 +28,7 @@ Player::Player(std::string _jobName)
 void Player::SetLevel(int _level) { level = _level; }
 void Player::SetHp(int _hp) { hp = _hp; }
 void Player::SetAtk(int _atk) { atk = _atk; }
+void Player::SetDef(int _def) { def = _def; }
 void Player::SetDex(int _dex) { dex = _dex; }
 
 //void Player::PrintStatus() const {
@@ -76,36 +80,83 @@ void Player::LevelUp()
     }
 }
 
-void Player::TakeDamage(int _damage)
+void Player::TakeDamage(int _damage, int attackerDex)
 {
-    hp -= _damage;
+    // 명중률 계산: 무기 명중률 + (공격자 DEX - 방어자 DEX) × 2
+    int finalHitRate = 90 + (attackerDex - dex) * 2;
+    if (finalHitRate < 5) finalHitRate = 5;
+    else if (finalHitRate > 95) finalHitRate = 95;
+
+    int roll = std::rand() % 100;
+
+    if (roll < finalHitRate)
+    {
+        // 명중 시 방어력 계산 적용
+        // 최종 데미지 = (공격력 × 무기배율) × (1.0 - (방어력 × 0.03))
+        int damageAfterDef = static_cast<int>(_damage * (1.0 - (def * 0.03)));
+
+        hp -= damageAfterDef;
+        Render::GetInstance().AddLog("당신은 " + std::to_string(damageAfterDef) + "의 데미지를 입었습니다!", CLR_RED);
+    }
+    else
+    {
+        Render::GetInstance().AddLog("공격이 빗나갔습니다!", CLR_WHITE);
+    }
 }
 
 Player::~Player() { }
 
-void Player::DetectMonsters(std::vector<Monster*>& _monsters)
+void Player::UpdateDash()
 {
-    for (Monster* monster : _monsters)
+    int dexBonus = std::min(dex, 10);
+
+    if (dashGauge < maxDashGauge)
     {
-        if (monster == nullptr) continue;
+        dashGauge += 10 + (dexBonus * 2);
 
-        MonsterState oldState = monster->GetState();
-        int dist = std::max(std::abs(x - monster->GetX()), std::abs(y - monster->GetY()));
+        if (dashGauge > maxDashGauge) dashGauge = maxDashGauge;
+    }
+}
 
-        if (dist <= combatRange)      monster->SetState(MonsterState::COMBAT);
-        else if (dist <= chaseRange) monster->SetState(MonsterState::CHASE);
-        else                          monster->SetState(MonsterState::IDLE);
+bool Player::Attack(Monster* target)
+{
+    if (!target) return false;
 
-        MonsterState newState = monster->GetState();
+    int playerDex = this->dex;
+    int monsterDex = target->GetDex();
 
-        if (oldState != newState)
+    // 명중률 계산: 무기 명중률 + (공격자 DEX - 방어자 DEX) × 2
+    int finalHitRate = equippedWeaponHit + (playerDex - monsterDex) * 2;
+
+    if (finalHitRate < 5) finalHitRate = 5;
+    else if (finalHitRate > 95) finalHitRate = 95;
+
+    int roll = std::rand() % 100;
+
+    if (roll < finalHitRate)
+    {
+        // 몬스터의 방어력 계산
+        // 최종 데미지 = (공격력 × 무기배율) × (1.0 - (방어력 × 0.03))
+        int monsterDef = target->GetDef();
+        int damage = static_cast<int>(this->atk * (1.0 - (monsterDef * 0.03)));
+
+        target->TakeDamage(damage);
+
+        Render::GetInstance().AddLog(target->GetName() + "에게 " + std::to_string(damage) + "의 데미지!", CLR_WHITE);
+
+        if (target->IsDead())
         {
-            if (newState == MonsterState::CHASE)
-                Render::GetInstance().AddLog(monster->GetName() + "가 당신을 발견했습니다!", CLR_YELLOW);
-            else if (newState == MonsterState::COMBAT)
-                Render::GetInstance().AddLog(monster->GetName() + "와 전투를 시작합니다!", CLR_RED);
-            else if (newState == MonsterState::IDLE && oldState != MonsterState::IDLE)
-                Render::GetInstance().AddLog(monster->GetName() + "가 추적을 포기했습니다.", CLR_DARK_GRAY);
+            int monsterExp = target->GetExp();
+            this->GainExp(monsterExp);
+
+            Render::GetInstance().AddLog(target->GetName() + "을(를) 처치하여 " + std::to_string(monsterExp) + " EXP 획득!", CLR_YELLOW);
         }
+
+        return true;
+    }
+    else
+    {
+        Render::GetInstance().AddLog(target->GetName() + "에게 공격이 빗나갔습니다!", CLR_DARK_GRAY);
+        return false;
     }
 }

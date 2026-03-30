@@ -4,7 +4,8 @@
 #include <iostream>
 
 struct Map;
-struct Monster;
+
+class Monster;
 
 class Player
 {
@@ -20,6 +21,7 @@ protected:
     int hp;
     int maxHp;
     int atk;
+    int def;
     int dex;
 
     int level;
@@ -30,11 +32,16 @@ protected:
     // Level up bonus
     int maxHpBonus;
     int atkBonus;
+    int defBonus;
     int dexBonus;
     int hpBonus;
 
     // Inventory            inventory;
     // vector<StatusEffect> statusEffects;
+
+    int dashGauge = 0;
+    const int maxDashGauge = 120;
+    int equippedWeaponHit = 90;
 
 public:
     Player(std::string _jobName);
@@ -54,6 +61,7 @@ public:
     int GetExp()       const { return exp; }
     int GetExpToNext() const { return expToNext; }
     int GetAtk()       const { return atk; }
+    int GetDef()       const { return def; }
     int GetDex()       const { return dex; }
     int GetX()         const { return x; }
     int GetY()         const { return y; }
@@ -62,6 +70,7 @@ public:
     void SetLevel(int _level);
     void SetHp(int _hp);
     void SetAtk(int _atk);
+    void SetDef(int _def);
     void SetDex(int _dex);
     void SetX(int _x) { x = _x; }
     void SetY(int _y) { y = _y; }
@@ -72,7 +81,13 @@ public:
 
     void GainExp(int _exp);
     void LevelUp();
-    void TakeDamage(int _damage);
+    void TakeDamage(int _damage, int attackerDex = 0);
 
-    void DetectMonsters(std::vector<Monster*>& _monsters);
+    void UpdateDash();
+    bool CanDash() const { return dashGauge >= maxDashGauge; }
+    void UseDash() { dashGauge = 0; }
+
+    int GetDashGauge() const { return dashGauge; }
+
+    bool Attack(Monster* target);
 };

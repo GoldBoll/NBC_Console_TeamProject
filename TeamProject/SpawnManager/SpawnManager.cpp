@@ -3,6 +3,7 @@
 #include "../Monster/Orc.h"
 #include "../Monster/Mimic.h"
 #include "../Monster/Golem.h"
+#include <cstdlib>
 
 SpawnManager::SpawnManager()
 {
@@ -12,82 +13,62 @@ SpawnManager::~SpawnManager()
 {
     for (Monster* m : activeMonsters)
     {
-        delete m;
+        if (m) delete m;
     }
     activeMonsters.clear();
 }
 
-const vector<Monster*>& SpawnManager::GetActiveMonsters() const
+const std::vector<Monster*>& SpawnManager::GetActiveMonsters() const
 {
     return activeMonsters;
 }
 
-void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _roomList)
+void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _rooms, int playerX, int playerY)
 {
-    for (const auto& room : _roomList)
+    activeMonsters.clear();
+
+    for (const auto& room : _rooms)
     {
-        if (room.type == RoomType::Start || room.type == RoomType::Stair) continue;
+        // 시작 방(Type::Start)에는 일반 몹 스폰 안함
+        if (room.type == RoomType::Start) continue;
 
-        /*if (room.type == RoomType::Boss)
+        // 엘리트 혹은 보물방일 때 (엘리트 몹 1마리)
+        if (room.type == RoomType::Elite || room.type == RoomType::Treasure)
         {
-            int rx = room.x + 1 + (rand() % (room.w - 2));
-            int ry = room.y + 1 + (rand() % (room.h - 2));
-            int spawned = 0;
-            while (spawned < 1)
-            {
-                if (_map.GetTile(rx, ry) == Tile::Floor)
-                {
-                    Monster* newBossMonster = new Goblin(true);
-                    newBossMonster->SetPosition(rx, ry);
-                    activeMonsters.push_back(newBossMonster);
-                    _map.SetTile(rx, ry, Tile::Boss);
-                    spawned++;
-                }
-            }
-            continue;
-        }*/
+            int rx = room.x + 1 + (rand() % (max(1, room.w - 2)));
+            int ry = room.y + 1 + (rand() % (max(1, room.h - 2)));
 
-        else if (room.type == RoomType::Treasure || room.type == RoomType::Elite)
-        {
-            int rx = room.x + 1 + (rand() % (room.w - 2));
-            int ry = room.y + 1 + (rand() % (room.h - 2));
-            int spawned = 0;
-            while (spawned < 1)
+            // 플레이어와 겹치지 않을 때까지 좌표 재선정 (최대 10번 시도)
+            for(int attempt=0; attempt<10; ++attempt)
             {
-                if (_map.GetTile(rx, ry) == Tile::Floor)
-                {
-                    Monster* newEliteMonster = new Goblin(true);
-                    newEliteMonster->SetPosition(rx, ry);
-                    activeMonsters.push_back(newEliteMonster);
-                    _map.SetTile(rx, ry, Tile::EliteMonster);
-                    spawned++;
-                }
+                if (rx != playerX || ry != playerY) break;
+                rx = room.x + 1 + (rand() % (max(1, room.w - 2)));
+                ry = room.y + 1 + (rand() % (max(1, room.h - 2)));
             }
-            continue;
+
+            if (_map.GetTile(rx, ry) == Tile::Floor)
+            {
+                Monster* m = new Goblin(true);
+                m->SetPosition(rx, ry);
+                activeMonsters.push_back(m);
+                _map.SetTile(rx, ry, Tile::EliteMonster);
+            }
         }
-        
+        // 일반 방일 때
         else if (room.type == RoomType::Normal)
         {
-            int monsterCount = (rand() % 4) + 1;
-
-            int spawned = 0;
-            int attempts = 0;
-
-            while (spawned < monsterCount && attempts < 10)
+            int monsterCount = (rand() % 3) + 1;
+            for (int i = 0; i < monsterCount; ++i)
             {
-                attempts++;
+                int rx = room.x + 1 + (rand() % (max(1, room.w - 2)));
+                int ry = room.y + 1 + (rand() % (max(1, room.h - 2)));
 
-                int rx = room.x + 1 + (rand() % (room.w - 2));
-                int ry = room.y + 1 + (rand() % (room.h - 2));
-
-                if (_map.GetTile(rx, ry) == Tile::Floor)
+                if (_map.GetTile(rx, ry) == Tile::Floor && (rx != playerX || ry != playerY))
                 {
-                    Monster* newMonster = new Goblin(false);
-                    newMonster->SetPosition(rx, ry);
-                    activeMonsters.push_back(newMonster);
+                    Monster* m = (rand() % 2 == 0) ? (Monster*)new Goblin(false) : (Monster*)new Orc(false);
+                    m->SetPosition(rx, ry);
+                    activeMonsters.push_back(m);
                     _map.SetTile(rx, ry, Tile::Monster);
-
-                    spawned++;
                 }
             }
         }
@@ -100,13 +81,13 @@ void SpawnManager::UpdateCleanup(Map& _map)
     while (it != activeMonsters.end())
     {
         Monster* m = *it;
-
-        if (m->IsDead())
+        if (m && m->IsDead())
         {
-            _map.SetTile(m->GetX(), m->GetY(), Tile::Floor);
-
+            if (_map.InBounds(m->GetX(), m->GetY()))
+            {
+                _map.SetTile(m->GetX(), m->GetY(), Tile::Floor);
+            }
             delete m;
-
             it = activeMonsters.erase(it);
         }
         else

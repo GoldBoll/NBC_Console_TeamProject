@@ -1,16 +1,26 @@
 ﻿#include "GameManager.h"
+#include "../BspManager/BspManager.h"
 #include "../Render/Render.h"
 #include "../Player/Player.h"
 #include <windows.h>
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 #include "../SpawnManager/SpawnManager.h"
+
+// 수동 클램프 함수
+template<typename T>
+T ClampValue(T val, T minVal, T maxVal)
+{
+    if (val < minVal) return minVal;
+    if (val > maxVal) return maxVal;
+    return val;
+}
 
 GameManager& GameManager::GetInstance()
 {
     static GameManager instance;
     return instance;
-    
 }
 
 GameManager::GameManager()
@@ -24,169 +34,259 @@ void GameManager::Init()
 
     Render& render = Render::GetInstance();
     render.Init("TextRPG - NBC Team Project 2");
-    
-    
-    
+
     // BSP 맵 생성
     BspManager::Params bspParams;
-    // bspParams.seed     = 12345;  // 고정 시드가 필요하면 주석 해제
-    // bspParams.maxDepth = 4;      // 깊이 줄이면 방이 크고 적어짐
-    // bspParams.minPartitionW = 40; bspParams.minPartitionH = 40; // 큰 방
     BspManager::GetInstance().Generate(map, bspParams);
 
     const std::vector<Room>& rooms = BspManager::GetInstance().GetRooms();
 
-    // 플레이어 스폰: 첫 번째 방 중앙
+    // 플레이어 스폰
     if (!rooms.empty())
     {
         player->SetX(rooms.front().CenterX());
         player->SetY(rooms.front().CenterY());
     }
 
-    // 계단: 마지막 방 중앙
+    // 계단
     if (rooms.size() >= 2)
     {
         map.SetTile(rooms.back().CenterX(), rooms.back().CenterY(), Tile::Stair);
     }
 
-    SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms);
+    // 몬스터 스폰 (스냅샷 생성 전 수행)
+    SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms, player->GetX(), player->GetY());
     monsters = SpawnManager::GetInstance()->GetActiveMonsters();
-    
+
     render.DrawStaticUI();
     render.RenderHelp();
-    
-    render.AddLog("Game started!",              CLR_YELLOW);
-    render.AddLog("WASD / arrow keys to move.", CLR_GRAY);
-    
-    running     = true;
-    needsRedraw = true;
 
-    render.RenderMap(map, player);
-    render.RenderInfo(player);
-    render.RenderLog();
-    /*for (int y = 0; y < MAP_H; ++y)
-    {
-        for (int x = 0; x < MAP_W; ++x)
-        {
-            if (map.GetTile(x, y) == Tile::Monster)
-            {
-                Monster* monster = new Monster("Slime", 10, 1, 1, 10);
-                monster->SetPosition(x, y);
-                monsters.push_back(monster);
-                map.SetTile(x, y, Tile::Floor);
-            }   
-        }
-    }*/
+    render.AddLog("게임이 시작되었습니다!", CLR_YELLOW);
+    render.AddLog("WASD: 이동  |  `: 대쉬 활성화", CLR_GRAY);
+
+    running      = true;
+    needsRedraw  = true;
+    isBattleMode = false;
+    inputbutton  = false;
+    isNextMoveDash = false;
 }
 
 void GameManager::Run()
 {
     Init();
-    
+
     Render&       render = Render::GetInstance();
     InputManager& input  = InputManager::GetInstance();
-    
+
+    // 초기 화면 강제 렌더링
+    render.RenderMap(map, player, monsters);
+    render.RenderInfo(player);
+    render.RenderLog();
+
     while (running)
     {
+        // 입력 부하 방지 및 시스템 응답성 확보
+        Sleep(5);
+
         GameAction action = input.PollInput();
+
         if (action != GameAction::None)
         {
+            // 입력이 감지되면 즉시 처리 플래그 설정
             HandleAction(action);
 
             if (inputbutton)
             {
                 UpdateMonster();
+                inputbutton = false;
             }
             needsRedraw = true;
         }
 
+        // 렌더링이 필요한 경우에만 수행 (needsRedraw)
         if (needsRedraw)
         {
-            render.RenderMap(map, player);
+            render.RenderMap(map, player, monsters);
             render.RenderInfo(player);
             render.RenderLog();
             needsRedraw = false;
         }
+
+        if (!player->IsAlive())
+        {
+            render.AddLog("더 이상 일어설 수 없습니다...", CLR_RED);
+            render.RenderLog();
+            Sleep(2000);
+            running = false;
+        }
     }
-    
+
     system("cls");
-    std::cout << "Game over. Thanks for playing!\n";
+    std::cout << "\n\n  GAME OVER...\n\n";
+    Sleep(2000);
 }
 
 void GameManager::HandleAction(GameAction action)
 {
     Render& render = Render::GetInstance();
     bool moved = false;
-    
+
+    // 전투 중 명령
+    if (isBattleMode && battleTarget != nullptr)
+    {
+        if (battleTarget->IsDead())
+        {
+            isBattleMode = false;
+            battleTarget = nullptr;
+            return;
+        }
+
+        switch (action)
+        {
+            case GameAction::Action1:
+            player->Attack(battleTarget);
+            if (battleTarget && !battleTarget->IsDead()) battleTarget->Attack(player);
+            break;
+
+            case GameAction::Action2:
+            if (rand() % 100 < 55)
+            {
+                render.AddLog("성공적으로 도망쳤습니다!", CLR_CYAN);
+                isBattleMode = false;
+                battleTarget->SetState(MonsterState::IDLE);
+                battleTarget = nullptr;
+                player->SetX(ClampValue(player->GetX() + 1, 0, MAP_W - 1));
+            }
+            else
+            {
+                render.AddLog("도망에 실패하여 공격당했습니다!", CLR_RED);
+                if (battleTarget && !battleTarget->IsDead()) battleTarget->Attack(player);
+            }
+            break;
+
+            case GameAction::Quit: running = false; break;
+            default: break;
+        }
+
+        needsRedraw = true;
+        return;
+    }
+
+    // 탐색 중 이동 - 대쉬 시 2칸 이동
+    int moveDist = isNextMoveDash ? 2 : 1;
+    int dx = 0, dy = 0;
+
     switch (action)
     {
-        case GameAction::MoveUp:
-        render.AddLog("moved up",    CLR_DARK_GRAY);
-        player->SetY(player->GetY() - 1);
-        needsRedraw = true;
-        moved = true;
-        inputbutton = true;
+        case GameAction::Dash:
+        if (player->CanDash())
+        {
+            isNextMoveDash = true;
+            render.AddLog("대쉬 기운이 감돕니다!", CLR_YELLOW);
+        }
+        else render.AddLog("게이지가 부족합니다.", CLR_DARK_GRAY);
         break;
-        
-        case GameAction::MoveDown:
-        render.AddLog("moved down",  CLR_DARK_GRAY);
-        player->SetY(player->GetY() + 1);
-        needsRedraw = true;
-        moved = true;
-        inputbutton = true;
-        break;
-        
-        case GameAction::MoveLeft:
-        render.AddLog("moved left",  CLR_DARK_GRAY);
-        player->SetX(player->GetX() - 1);
-        needsRedraw = true;
-        moved = true;
-        inputbutton = true;
-        break;
-        
-        case GameAction::MoveRight:
-        render.AddLog("moved right", CLR_DARK_GRAY);
-        player->SetX(player->GetX() + 1);
-        needsRedraw = true;
-        moved = true;
-        inputbutton = true;
-        break;
-        
-        case GameAction::Help:
-        render.AddLog("WASD/arrows: move  |  h: help  |  q: quit", CLR_CYAN);
-        needsRedraw = true;
-        break;
-        
-        case GameAction::Quit:
-        running = false;
-        break;
-        
-        default:
-        break;
+
+        case GameAction::MoveUp:    dy = -1; break;
+        case GameAction::MoveDown:  dy = 1;  break;
+        case GameAction::MoveLeft:  dx = -1; break;
+        case GameAction::MoveRight: dx = 1;  break;
+        case GameAction::Help: render.AddLog("WASD: 이동 | `: 대쉬 | 1: 공격 | 2: 도망", CLR_CYAN); break;
+        case GameAction::Quit: running = false; break;
+        default: break;
     }
-    //if (moved)
-    //{
-    //    // 1. DetectMonsters의 인자 타입을 포인터 벡터 버전으로 맞춰줘야 해! (아래 팁 참고)
-    //    player->DetectMonsters(monsters); 
-    //    
-    //    // 2. 반복문에서 Monster* (포인터)를 꺼내야 해
-    //    for (Monster* monster : monsters) 
-    //    {
-    //        if (monster == nullptr) continue; // 안전장치!
-    //        
-    //        // 3. 포인터니까 점(.)이 아니라 화살표(->)를 써야 해
-    //        monster->Update(player->GetX(), player->GetY());
-    //    }
-    //    needsRedraw = true;
-    //}
+
+    // 이동 처리 (몬스터 충돌 감지 포함)
+    if (dx != 0 || dy != 0)
+    {
+        for (int i = 0; i < moveDist; ++i)
+        {
+            int nextX = ClampValue(player->GetX() + dx, 0, MAP_W - 1);
+            int nextY = ClampValue(player->GetY() + dy, 0, MAP_H - 1);
+
+            // 이동 경로 상에 몬스터가 있는지 즉시 체크
+            Monster* victim = nullptr;
+            for (Monster* m : monsters)
+            {
+                if (m && !m->IsDead() && m->GetX() == nextX && m->GetY() == nextY)
+                {
+                    victim = m;
+                    break;
+                }
+            }
+
+            // 몬스터 발견 시 그 칸까지만 이동하고 루프 중단
+            if (victim)
+            {
+                player->SetX(nextX);
+                player->SetY(nextY);
+                moved = true;
+                break;
+            }
+
+            // 몬스터가 없으면 이동 후 계속 진행 (대쉬일 경우 2번째 칸까지)
+            player->SetX(nextX);
+            player->SetY(nextY);
+            moved = true;
+        }
+    }
+
+    if (moved)
+    {
+        if (isNextMoveDash)
+        {
+            player->UseDash();
+            isNextMoveDash = false;
+        }
+        else
+        {
+            // 대쉬를 사용하지 않은 일반 이동 턴에만 게이지 충전
+            player->UpdateDash();
+        }
+
+        inputbutton = true;
+
+        for (Monster* m : monsters)
+        {
+            if (m && !m->IsDead()) m->Update(player->GetX(), player->GetY(), map);
+        }
+
+        ProcessBattle();
+
+        SpawnManager::GetInstance()->UpdateCleanup(map);
+        monsters = SpawnManager::GetInstance()->GetActiveMonsters();
+
+        needsRedraw = true;
+    }
 }
 
 void GameManager::UpdateMonster()
 {
-    for (Monster* monster : monsters)
+    if (isBattleMode) return;
+    for (Monster* m : monsters)
     {
-        if (monster == nullptr || monster->IsDead()) continue;
+        if (m && !m->IsDead()) m->UpdateAI(map);
+    }
+}
 
-        monster->UpdateAI(map);
+void GameManager::ProcessBattle()
+{
+    battle.CheckCombat(player, monsters);
+
+    for (Monster* m : monsters)
+    {
+        if (!m || m->IsDead()) continue;
+        if (m->GetX() == player->GetX() && m->GetY() == player->GetY())
+        {
+            if (!isBattleMode)
+            {
+                isBattleMode = true;
+                battleTarget = m;
+                isNextMoveDash = false;
+                Render::GetInstance().AddLog(" [ 전투 시작 ] ", CLR_MAGENTA);
+                Render::GetInstance().AddLog(" 1: 공격 | 2: 도망 ", CLR_YELLOW);
+            }
+            break;
+        }
     }
 }

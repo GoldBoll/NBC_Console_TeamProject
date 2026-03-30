@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <unordered_map>
 
 enum class GameAction
@@ -8,6 +8,9 @@ enum class GameAction
     MoveDown,
     MoveLeft,
     MoveRight,
+    Action1,
+    Action2,
+    Dash,
     Help,
     Quit,
 };

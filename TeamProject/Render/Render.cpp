@@ -3,6 +3,7 @@
 #include "Render.h"
 #include <iostream>
 #include <string>
+#include "../Monster/Monster.h"
 #include <algorithm>
 
 Render& Render::GetInstance()
@@ -12,7 +13,7 @@ Render& Render::GetInstance()
 }
 
 Render::Render()
-    : hOut(GetStdHandle(STD_OUTPUT_HANDLE))
+: hOut(GetStdHandle(STD_OUTPUT_HANDLE))
 {}
 
 void Render::Init(const char* title)
@@ -22,14 +23,14 @@ void Render::Init(const char* title)
     SystemParametersInfo(SPI_GETWORKAREA, 0, &workArea, 0);
     int screenW = workArea.right  - workArea.left;
     int screenH = workArea.bottom - workArea.top;
-
+    
     // 2. 기본 폰트 크기로 창을 키움
     constexpr SHORT TARGET_FONT = 16;
     SHORT fontByW  = (SHORT)(screenW / TOTAL_W);
     SHORT fontByH  = (SHORT)((screenH - 40) / TOTAL_H);
     SHORT fontSize = min(TARGET_FONT, min(fontByW, fontByH));
     fontSize = max((SHORT)6, fontSize);
-
+    
     CONSOLE_FONT_INFOEX fontInfo = {};
     fontInfo.cbSize       = sizeof(fontInfo);
     fontInfo.dwFontSize   = { 0, fontSize };
@@ -37,22 +38,22 @@ void Render::Init(const char* title)
     fontInfo.FontWeight   = FW_NORMAL;
     wcscpy_s(fontInfo.FaceName, L"Consolas");
     SetCurrentConsoleFontEx(hOut, FALSE, &fontInfo);
-
+    
     // 3. 창을 최소 크기로 줄여야 버퍼 축소/확대 시 충돌이 없음
     SMALL_RECT minRect = { 0, 0, 1, 1 };
     SetConsoleWindowInfo(hOut, TRUE, &minRect);
-
+    
     // 4. 버퍼 크기 = 전체 콘솔 크기 (스크롤바 없음)
     COORD bufSize = { (SHORT)TOTAL_W, (SHORT)TOTAL_H };
     SetConsoleScreenBufferSize(hOut, bufSize);
-
+    
     // 5. 창 크기를 버퍼와 동일하게 맞춤
     SMALL_RECT winRect = { 0, 0, (SHORT)(TOTAL_W - 1), (SHORT)(TOTAL_H - 1) };
     SetConsoleWindowInfo(hOut, TRUE, &winRect);
-
+    
     CONSOLE_CURSOR_INFO ci = { 1, FALSE };
     SetConsoleCursorInfo(hOut, &ci);
-
+    
     SetConsoleTitleA(title);
 }
 
@@ -76,10 +77,10 @@ void Render::RenderHelp()
         { "q",    "quit",  CLR_RED    },
     };
     constexpr int entryCount = (int)(sizeof(entries) / sizeof(entries[0]));
-
+    
     ClearRegion(HELP_BAR_X + 1, HELP_BAR_Y + 1, HELP_BAR_W - 2, HELP_BAR_H - 2);
     GotoXY(HELP_BAR_X + 1, HELP_BAR_Y + 1);
-
+    
     for (int i = 0; i < entryCount; ++i)
     {
         SetColor(CLR_DARK_GRAY);
@@ -96,11 +97,11 @@ void Render::RenderHelp()
     ResetColor();
 }
 
-void Render::RenderMap(const Map& map, const Player* player)
+void Render::RenderMap(const Map& map, const Player* player, const std::vector<Monster*>& monsters)
 {
     int camX = std::max(0, std::min(player->GetX() - VIEW_W / 2, MAP_W - VIEW_W));
     int camY = std::max(0, std::min(player->GetY() - VIEW_H / 2, MAP_H - VIEW_H));
-
+    
     for (int row = 0; row < VIEW_H; ++row)
     {
         GotoXY(MAP_BOX_X + 1, MAP_BOX_Y + 1 + row);
@@ -108,192 +109,265 @@ void Render::RenderMap(const Map& map, const Player* player)
         {
             int wx = camX + col;
             int wy = camY + row;
-
+            
             if (wx < 0 || wy < 0 || wx >= MAP_W || wy >= MAP_H)
             {
                 SetColor(CLR_DARK_GRAY);
                 std::cout << ' ';
                 continue;
             }
-
-            if (wx == player->GetX() && wy == player->GetY())
-            {
-                SetColor(CLR_WHITE, CLR_DARK_RED);
-                std::cout << '@';
-                continue;
-            }
-
+            
             Tile tile = map.GetTile(wx, wy);
             char glyph;
             switch (tile)
             {
-            case Tile::Floor:
+                case Tile::Floor:
                 SetColor(CLR_DARK_GRAY);   glyph = ' '; break;
-            case Tile::Wall:
+                case Tile::Wall:
                 if (map.HasFloorNeighbor(wx, wy))
                 {
                     if (map.GetDebugRoomWall(wx, wy))
-                        SetColor(CLR_CYAN);   // 디버그: 방 경계 벽 (하늘색)
+                    SetColor(CLR_CYAN);   // 디버그: 방 경계 벽 (하늘색)
                     else
-                        SetColor(CLR_GRAY);   // 복도 벽 (회색)
+                    SetColor(CLR_GRAY);   // 복도 벽 (회색)
                     glyph = '#';
                 }
                 else
                 { SetColor(CLR_DARK_GRAY); glyph = ' '; }
                 break;
-            case Tile::Rock:
+                SetColor(CLR_GRAY);        glyph = '#'; break;
+                case Tile::Rock:
                 SetColor(CLR_DARK_YELLOW); glyph = 'R'; break;
-            case Tile::Water:
+                case Tile::Water:
                 SetColor(CLR_DARK_CYAN);   glyph = 'W'; break;
-            case Tile::Stair:
+                case Tile::Stair:
                 SetColor(CLR_YELLOW);      glyph = '>'; break;
-            case Tile::Chest:
+                case Tile::Chest:
                 SetColor(CLR_DARK_YELLOW); glyph = 'C'; break;
-            case Tile::Monster:
+                case Tile::Monster:
                 SetColor(CLR_RED);         glyph = 'M'; break;
-            case Tile::EliteMonster:
+                case Tile::EliteMonster:
                 SetColor(CLR_MAGENTA);     glyph = 'E'; break;
-            case Tile::Door:
-                SetColor(CLR_DARK_YELLOW, CLR_DARK_RED); glyph = '+'; break;
-            default:
+                default:
                 SetColor(CLR_DARK_GRAY);   glyph = ' '; break;
             }
             std::cout << glyph;
         }
     }
-    ResetColor();
-}
-
-void Render::RenderInfo(Player* player)
-{
-    ClearRegion(PLAYER_INFO_X + 1, PLAYER_INFO_Y + 1, MID_BOX_W - 2, PLAYER_INFO_H - 2);
-
-    int y = PLAYER_INFO_Y + 1;
-
-    SetColor(CLR_WHITE);
-    GotoXY(PLAYER_INFO_X + 1, y++);
-    std::cout << (player->GetJobName().empty() ? "Unknown" : player->GetJobName());
-    SetColor(CLR_DARK_CYAN);
-    GotoXY(PLAYER_INFO_X + 1, y++);
-    std::cout << "(" << player->GetX() << ", " << player->GetY() << ")";
-
-    ++y;
-
-    int barLen = MID_BOX_W - 6;
-    int filled = (player->GetMaxHP() > 0)
+    
+    // ── 몬스터 객체 렌더링 ───────────────────────────────────────────────────
+    for (Monster* monster : monsters)
+    {
+        if (monster == nullptr || monster->IsDead()) continue;
+        
+        int mx = monster->GetX();
+        int my = monster->GetY();
+        
+        // 현재 카메라 화면(Viewport) 내부에 있는지 확인
+        if (mx >= camX && mx < camX + VIEW_W &&
+            my >= camY && my < camY + VIEW_H)
+            {
+                GotoXY(MAP_BOX_X + 1 + (mx - camX),
+                MAP_BOX_Y + 1 + (my - camY));
+                
+                char glyph = monster->IsElite() ? 'E' : 'M';
+                int color = monster->IsElite() ? CLR_MAGENTA : CLR_RED;
+                
+                if (monster->GetState() == MonsterState::CHASE)
+                {
+                    SetColor(color, CLR_DARK_YELLOW);
+                }
+                else if (monster->GetState() == MonsterState::COMBAT)
+                {
+                    SetColor(CLR_WHITE, CLR_RED); // 전투 중이면 반전
+                }
+                else
+                {
+                    SetColor(color);
+                }
+                std::cout << glyph;
+            }
+        }
+        
+        // ── 플레이어 렌더링 (가장 위에 그려지도록 마지막에 이동) ───────────────
+        if (player->GetX() >= camX && player->GetX() < camX + VIEW_W &&
+        player->GetY() >= camY && player->GetY() < camY + VIEW_H)
+        {
+            GotoXY(MAP_BOX_X + 1 + (player->GetX() - camX),
+            MAP_BOX_Y + 1 + (player->GetY() - camY));
+            SetColor(CLR_WHITE, CLR_DARK_RED);
+            std::cout << '@';
+        }
+        
+        ResetColor();
+    }
+    
+    void Render::RenderInfo(Player* player)
+    {
+        ClearRegion(PLAYER_INFO_X + 1, PLAYER_INFO_Y + 1, MID_BOX_W - 2, PLAYER_INFO_H - 2);
+        
+        int y = PLAYER_INFO_Y + 1;
+        
+        SetColor(CLR_WHITE);
+        GotoXY(PLAYER_INFO_X + 1, y++);
+        std::cout << (player->GetJobName().empty() ? "Unknown" : player->GetJobName());
+        SetColor(CLR_DARK_CYAN);
+        GotoXY(PLAYER_INFO_X + 1, y++);
+        std::cout << "(" << player->GetX() << ", " << player->GetY() << ")";
+        
+        ++y;
+        
+        int barLen = MID_BOX_W - 6;
+        int filled = (player->GetMaxHP() > 0)
         ? (int)((float)player->GetHP() / player->GetMaxHP() * barLen)
         : 0;
-    filled = std::max(0, std::min(filled, barLen));
-
-    SetColor(CLR_GRAY);
-    GotoXY(PLAYER_INFO_X + 1, y);
-    std::cout << "HP ";
-    SetColor(CLR_RED);
-    for (int i = 0; i < filled; ++i)        std::cout << '#';
-    SetColor(CLR_DARK_GRAY);
-    for (int i = filled; i < barLen; ++i)   std::cout << '-';
-
-    SetColor(CLR_GRAY);
-    GotoXY(PLAYER_INFO_X + 1, ++y);
-    std::cout << player->GetHP() << "/" << player->GetMaxHP();
-
-    ++y;
-
-    SetColor(CLR_YELLOW);
-    GotoXY(PLAYER_INFO_X + 1, ++y);
-    std::cout << "Lv." << player->GetLevel()
-              << "  EXP " << player->GetExp() << "/" << player->GetExpToNext();
-
-    ResetColor();
-}
-
-void Render::RenderLog()
-{
-    ClearRegion(LOG_BOX_X + 1, LOG_BOX_Y + 1, LOG_BOX_W - 2, LOG_BOX_H - 2);
-
-    int total     = (int)logLines.size();
-    int startIdx  = std::max(0, total - LOG_MAX_LINES);
-    int drawCount = total - startIdx;
-
-    for (int i = 0; i < drawCount; ++i)
-    {
-        const std::string& msg   = logLines[startIdx + i].first;
-        const int          color = logLines[startIdx + i].second;
-
-        GotoXY(LOG_BOX_X + 1, LOG_BOX_Y + 1 + i);
-        SetColor(color);
-
-        std::string line = msg.substr(0, (size_t)(LOG_BOX_W - 2));
-        std::cout << line;
+        filled = std::max(0, std::min(filled, barLen));
+        
+        SetColor(CLR_GRAY);
+        GotoXY(PLAYER_INFO_X + 1, y);
+        std::cout << "HP ";
+        SetColor(CLR_RED);
+        for (int i = 0; i < filled; ++i)        std::cout << '#';
+        SetColor(CLR_DARK_GRAY);
+        for (int i = filled; i < barLen; ++i)   std::cout << '-';
+        
+        SetColor(CLR_GRAY);
+        GotoXY(PLAYER_INFO_X + 1, ++y);
+        std::cout << player->GetHP() << "/" << player->GetMaxHP();
+        
+        // --- DASH Bar 추가 ---
+        y += 2;
+        int dashFilled = (player->GetDashGauge() * barLen) / 120; // maxDashGauge 120 기준
+        dashFilled = std::max(0, std::min(dashFilled, barLen));
+        
+        SetColor(CLR_GRAY);
+        GotoXY(PLAYER_INFO_X + 1, y);
+        std::cout << "DS  ";
+        SetColor(CLR_YELLOW);
+        for (int i = 0; i < dashFilled; i++)        std::cout << '=';
+        SetColor(CLR_DARK_GRAY);
+        for (int i = dashFilled; i < barLen; i++)    std::cout << '-';
+        
+        SetColor(CLR_GRAY);
+        GotoXY(PLAYER_INFO_X + 1, ++y);
+        std::cout << player->GetDashGauge() << "/120";
+        
+        // ---------------------
+        y += 1;
+        SetColor(CLR_YELLOW);
+        GotoXY(PLAYER_INFO_X + 1, ++y);
+        std::cout << "Lv." << player->GetLevel()
+        << "  EXP " << player->GetExp() << "/" << player->GetExpToNext();
+        
+        ResetColor();
     }
-    ResetColor();
-}
-
-void Render::AddLog(const std::string& msg, int color)
-{
-    logLines.push_back({ msg, color });
-    if ((int)logLines.size() > LOG_MAX_LINES)
+    
+    void Render::RenderLog()
+    {
+        ClearRegion(LOG_BOX_X + 1, LOG_BOX_Y + 1, LOG_BOX_W - 2, LOG_BOX_H - 2);
+        
+        int total     = (int)logLines.size();
+        int startIdx  = std::max(0, total - LOG_MAX_LINES);
+        int drawCount = total - startIdx;
+        
+        for (int i = 0; i < drawCount; ++i)
+        {
+            const std::string& msg   = logLines[startIdx + i].first;
+            const int          color = logLines[startIdx + i].second;
+            
+            GotoXY(LOG_BOX_X + 1, LOG_BOX_Y + 1 + i);
+            SetColor(color);
+            
+            size_t maxLen = (size_t)(LOG_BOX_W - 3);
+            std::string line = msg;
+            
+            if (line.length() > maxLen)
+            {
+                line = msg.substr(0, maxLen);
+                
+                int isLead = 0;
+                for (size_t k = 0; k < line.length(); ++k)
+                {
+                    if (IsDBCSLeadByte((BYTE)line[k]))
+                    {
+                        if (k == line.length() - 1) isLead = 1;
+                        k++;
+                    }
+                }
+                if (isLead && !line.empty()) line.pop_back();
+            }
+            
+            std::cout << line;
+        }
+        ResetColor();
+    }
+    
+    void Render::AddLog(const std::string& msg, int color)
+    {
+        logLines.push_back({ msg, color });
+        if ((int)logLines.size() > LOG_MAX_LINES)
         logLines.pop_front();
-}
-
-void Render::GotoXY(int x, int y) const
-{
-    COORD pos = { (SHORT)x, (SHORT)y };
-    SetConsoleCursorPosition(hOut, pos);
-}
-
-void Render::SetColor(int fg, int bg) const
-{
-    SetConsoleTextAttribute(hOut, (WORD)((bg << 4) | fg));
-}
-
-void Render::ResetColor() const
-{
-    SetColor(CLR_GRAY, CLR_BLACK);
-}
-
-void Render::ClearRegion(int x, int y, int w, int h) const
-{
-    ResetColor();
-    std::string blank((size_t)w, ' ');
-    for (int i = 0; i < h; ++i)
-    {
-        GotoXY(x, y + i);
-        std::cout << blank;
     }
-}
-
-void Render::DrawBox(int x, int y, int w, int h,
-                     const std::string& title,
-                     int borderColor) const
-{
-    SetColor(borderColor);
-
-    GotoXY(x, y);
-    std::cout << '+';
-    if (!title.empty())
+    
+    void Render::GotoXY(int x, int y) const
     {
-        std::string t = '-' + title + '-';
-        std::cout << t;
-        int remaining = w - 2 - (int)t.size();
-        for (int i = 0; i < remaining; ++i) std::cout << '-';
+        COORD pos = { (SHORT)x, (SHORT)y };
+        SetConsoleCursorPosition(hOut, pos);
     }
-    else
+    
+    void Render::SetColor(int fg, int bg) const
     {
-        for (int i = 0; i < w - 2; ++i) std::cout << '-';
+        SetConsoleTextAttribute(hOut, (WORD)((bg << 4) | fg));
     }
-    std::cout << '+';
-
-    for (int i = 1; i < h - 1; ++i)
+    
+    void Render::ResetColor() const
     {
-        GotoXY(x,         y + i); std::cout << '|';
-        GotoXY(x + w - 1, y + i); std::cout << '|';
+        SetColor(CLR_GRAY, CLR_BLACK);
     }
-
-    GotoXY(x, y + h - 1);
-    std::cout << '+';
-    for (int i = 0; i < w - 2; ++i) std::cout << '-';
-    std::cout << '+';
-
-    ResetColor();
-}
+    
+    void Render::ClearRegion(int x, int y, int w, int h) const
+    {
+        ResetColor();
+        std::string blank((size_t)w, ' ');
+        for (int i = 0; i < h; ++i)
+        {
+            GotoXY(x, y + i);
+            std::cout << blank;
+        }
+    }
+    
+    void Render::DrawBox(int x, int y, int w, int h,
+        const std::string& title,
+        int borderColor) const
+        {
+            SetColor(borderColor);
+            
+            GotoXY(x, y);
+            std::cout << '+';
+            if (!title.empty())
+            {
+                std::string t = '-' + title + '-';
+                std::cout << t;
+                int remaining = w - 2 - (int)t.size();
+                for (int i = 0; i < remaining; ++i) std::cout << '-';
+            }
+            else
+            {
+                for (int i = 0; i < w - 2; ++i) std::cout << '-';
+            }
+            std::cout << '+';
+            
+            for (int i = 1; i < h - 1; ++i)
+            {
+                GotoXY(x,         y + i); std::cout << '|';
+                GotoXY(x + w - 1, y + i); std::cout << '|';
+            }
+            
+            GotoXY(x, y + h - 1);
+            std::cout << '+';
+            for (int i = 0; i < w - 2; ++i) std::cout << '-';
+            std::cout << '+';
+            
+            ResetColor();
+        }
+        

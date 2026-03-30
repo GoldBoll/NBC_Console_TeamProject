@@ -1,7 +1,12 @@
 ﻿#include "Orc.h"
-#include <iostream>
 
 Orc::Orc(bool _elite)
-    : Monster("오크", 6, 6, 3, 5, _elite)
+    : Monster("오크 ",
+             (_elite ? 22 : 15), // HP
+             (_elite ? 8  : 5),  // ATK
+             (_elite ? 6  : 4),  // DEF
+             (_elite ? 4  : 3),  // DEX
+             (_elite ? 8  : 5),  // EXP
+             _elite)
 {
 }

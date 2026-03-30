@@ -5,7 +5,7 @@
 #include "../Player/Player.h"
 #include "../Monster/Monster.h"
 #include "../GameManager/InputManager.h"
-#include "../BspManager/BspManager.h"
+#include "../Battle/Battle.h"
 
 class GameManager
 {
@@ -23,11 +23,16 @@ private:
     void Init();
     void HandleAction(GameAction action);
     void UpdateMonster();
+    void ProcessBattle();
 
     Map                  map;
     Player*              player;
     std::vector<Monster*> monsters;
     bool                 running     = false;
     bool                 needsRedraw = false;
-    bool inputbutton = false;
+    bool                 inputbutton = false;
+    bool                 isBattleMode = false;
+    bool                 isNextMoveDash = false;
+    Monster*             battleTarget = nullptr;
+    Battle               battle;
 };

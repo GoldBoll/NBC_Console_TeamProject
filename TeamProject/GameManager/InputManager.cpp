@@ -1,4 +1,4 @@
-#include "InputManager.h"
+﻿#include "InputManager.h"
 #include <conio.h>
 
 InputManager& InputManager::GetInstance()
@@ -25,8 +25,15 @@ void InputManager::SetupDefaultBindings()
 
     keyMap['q'] = GameAction::Quit;
     keyMap['Q'] = GameAction::Quit;
-    keyMap['h'] = GameAction::Help;
-    keyMap['H'] = GameAction::Help;
+    BindKey('i', GameAction::Help);
+    BindKey('q', GameAction::Quit);
+
+    // Battle Actions
+    BindKey('1', GameAction::Action1);
+    BindKey('2', GameAction::Action2);
+
+    // Exploration Actions
+    BindKey('`', GameAction::Dash);
 
     specialKeyMap[72] = GameAction::MoveUp;
     specialKeyMap[80] = GameAction::MoveDown;
