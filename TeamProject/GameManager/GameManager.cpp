@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <cstdlib>
 #include <ctime>
+#include "../SpawnManager/SpawnManager.h"
 
 GameManager& GameManager::GetInstance()
 {
@@ -47,7 +48,9 @@ void GameManager::Init()
     {
         map.SetTile(rooms.back().CenterX(), rooms.back().CenterY(), Tile::Stair);
     }
-    
+
+    SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms);
+    monsters = SpawnManager::GetInstance()->GetActiveMonsters();
     
     render.DrawStaticUI();
     render.RenderHelp();
@@ -57,8 +60,11 @@ void GameManager::Init()
     
     running     = true;
     needsRedraw = true;
-    
-    for (int y = 0; y < MAP_H; ++y)
+
+    render.RenderMap(map, player);
+    render.RenderInfo(player);
+    render.RenderLog();
+    /*for (int y = 0; y < MAP_H; ++y)
     {
         for (int x = 0; x < MAP_W; ++x)
         {
@@ -70,7 +76,7 @@ void GameManager::Init()
                 map.SetTile(x, y, Tile::Floor);
             }   
         }
-    }
+    }*/
 }
 
 void GameManager::Run()
@@ -82,16 +88,25 @@ void GameManager::Run()
     
     while (running)
     {
+        GameAction action = input.PollInput();
+        if (action != GameAction::None)
+        {
+            HandleAction(action);
+
+            if (inputbutton)
+            {
+                UpdateMonster();
+            }
+            needsRedraw = true;
+        }
+
         if (needsRedraw)
         {
-            render.RenderMap(map, player, monsters);
+            render.RenderMap(map, player);
             render.RenderInfo(player);
             render.RenderLog();
             needsRedraw = false;
         }
-        
-        GameAction action = input.PollInput();
-        HandleAction(action);
     }
     
     system("cls");
@@ -110,6 +125,7 @@ void GameManager::HandleAction(GameAction action)
         player->SetY(player->GetY() - 1);
         needsRedraw = true;
         moved = true;
+        inputbutton = true;
         break;
         
         case GameAction::MoveDown:
@@ -117,6 +133,7 @@ void GameManager::HandleAction(GameAction action)
         player->SetY(player->GetY() + 1);
         needsRedraw = true;
         moved = true;
+        inputbutton = true;
         break;
         
         case GameAction::MoveLeft:
@@ -124,6 +141,7 @@ void GameManager::HandleAction(GameAction action)
         player->SetX(player->GetX() - 1);
         needsRedraw = true;
         moved = true;
+        inputbutton = true;
         break;
         
         case GameAction::MoveRight:
@@ -131,6 +149,7 @@ void GameManager::HandleAction(GameAction action)
         player->SetX(player->GetX() + 1);
         needsRedraw = true;
         moved = true;
+        inputbutton = true;
         break;
         
         case GameAction::Help:
@@ -145,19 +164,29 @@ void GameManager::HandleAction(GameAction action)
         default:
         break;
     }
-    if (moved)
+    //if (moved)
+    //{
+    //    // 1. DetectMonsters의 인자 타입을 포인터 벡터 버전으로 맞춰줘야 해! (아래 팁 참고)
+    //    player->DetectMonsters(monsters); 
+    //    
+    //    // 2. 반복문에서 Monster* (포인터)를 꺼내야 해
+    //    for (Monster* monster : monsters) 
+    //    {
+    //        if (monster == nullptr) continue; // 안전장치!
+    //        
+    //        // 3. 포인터니까 점(.)이 아니라 화살표(->)를 써야 해
+    //        monster->Update(player->GetX(), player->GetY());
+    //    }
+    //    needsRedraw = true;
+    //}
+}
+
+void GameManager::UpdateMonster()
+{
+    for (Monster* monster : monsters)
     {
-        // 1. DetectMonsters의 인자 타입을 포인터 벡터 버전으로 맞춰줘야 해! (아래 팁 참고)
-        player->DetectMonsters(monsters); 
-        
-        // 2. 반복문에서 Monster* (포인터)를 꺼내야 해
-        for (Monster* monster : monsters) 
-        {
-            if (monster == nullptr) continue; // 안전장치!
-            
-            // 3. 포인터니까 점(.)이 아니라 화살표(->)를 써야 해
-            monster->Update(player->GetX(), player->GetY());
-        }
-        needsRedraw = true;
+        if (monster == nullptr || monster->IsDead()) continue;
+
+        monster->UpdateAI(map);
     }
 }

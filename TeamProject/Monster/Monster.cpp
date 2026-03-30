@@ -1,4 +1,4 @@
-#include "Monster.h"
+﻿#include "Monster.h"
 #include <cstdlib>
 
 Monster::Monster(std::string _name, int _hp, int _atk, int _dex, int _exp)
@@ -90,8 +90,8 @@ void Monster::Move(int _x, int _y, Map& _map)
 
 void Monster::UpdateAI(Map& _map)
 {
-    // 너무 자주 움직이지 않게 확률 부여 (10% 확률로 이동)
-    if (rand() % 100 > 10) return;
+    // 너무 자주 움직이지 않게 확률 부여 (30% 확률로 이동)
+    if (rand() % 100 > 30) return;
 
     int direction = rand() % 4;
     int dx = 0, dy = 0;
@@ -119,7 +119,7 @@ void Monster::UpdateAI(Map& _map)
     }
 
     int nextX = x + dx;
-    int nextY = y = dy;
+    int nextY = y + dy;
 
     if (_map.GetTile(nextX, nextY)== Tile::Floor)
     {

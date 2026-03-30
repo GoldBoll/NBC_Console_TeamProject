@@ -22,10 +22,11 @@ const vector<Monster*>& SpawnManager::GetActiveMonsters() const
     return activeMonsters;
 }
 
-void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& roomList)
+void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _roomList)
 {
-    for (const auto& room : roomList)
+    for (const auto& room : _roomList)
     {
+
         int monsterCount = (rand() % 4) + 1;
 
         int spawned = 0;

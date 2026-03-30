@@ -24,7 +24,7 @@ public:
     ~SpawnManager();
 
     const std::vector<Monster*>& GetActiveMonsters() const;
-    void SpawnMonstersInRooms(Map& _map, const std::vector<Room>& roomList);
+    void SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _roomList);
     void UpdateCleanup(Map& _map);
 };
 

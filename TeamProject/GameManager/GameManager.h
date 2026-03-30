@@ -22,10 +22,12 @@ private:
 
     void Init();
     void HandleAction(GameAction action);
+    void UpdateMonster();
 
     Map                  map;
     Player*              player;
     std::vector<Monster*> monsters;
     bool                 running     = false;
     bool                 needsRedraw = false;
+    bool inputbutton = false;
 };
