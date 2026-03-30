@@ -42,6 +42,9 @@ class Map
 protected:
     Tile tiles[MAP_H][MAP_W];
 
+    // 디버그: BSP 방 경계 벽 여부 (true = 방 벽, false = 복도 벽 또는 일반 벽)
+    bool debugRoomWall[MAP_H][MAP_W] = {};
+
 public:
     // 타일 읽기
     Tile GetTile(int x, int y)              const { return tiles[y][x]; }
@@ -55,14 +58,18 @@ public:
     // 맵 전체를 특정 타일로 채움
     void Fill(Tile t) { std::fill(&tiles[0][0], &tiles[0][0] + MAP_W * MAP_H, t); }
 
+    // 디버그 방 경계 벽 접근
+    bool GetDebugRoomWall(int x, int y)     const { return debugRoomWall[y][x]; }
+    void SetDebugRoomWall(int x, int y, bool v)   { debugRoomWall[y][x] = v; }
+    void ClearDebugRoomWall() { std::fill(&debugRoomWall[0][0], &debugRoomWall[0][0] + MAP_W * MAP_H, false); }
+
     // 주변 8방향에 Floor 타일이 하나라도 있는지 확인 (렌더링에서 벽 표시 여부 판단용)
     bool HasFloorNeighbor(int x, int y) const;
-    
 
     char TileToChar(int x, int y)           const;
 
-    void LoadStage1();
-
-    void DrawViewport(const Player& player) const;
+    //레거시 코드
+    //void LoadStage1();
+    //void DrawViewport(const Player& player) const;
 };
 

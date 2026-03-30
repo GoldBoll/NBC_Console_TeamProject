@@ -131,7 +131,13 @@ void Render::RenderMap(const Map& map, const Player* player, const std::vector<M
                 SetColor(CLR_DARK_GRAY);   glyph = ' '; break;
             case Tile::Wall:
                 if (map.HasFloorNeighbor(wx, wy))
-                { SetColor(CLR_GRAY); glyph = '#'; }
+                {
+                    if (map.GetDebugRoomWall(wx, wy))
+                        SetColor(CLR_CYAN);   // 디버그: 방 경계 벽 (하늘색)
+                    else
+                        SetColor(CLR_GRAY);   // 복도 벽 (회색)
+                    glyph = '#';
+                }
                 else
                 { SetColor(CLR_DARK_GRAY); glyph = ' '; }
                 break;
