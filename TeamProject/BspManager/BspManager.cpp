@@ -1,6 +1,7 @@
 #include "BspManager.h"
 #include <ctime>
 #include <algorithm>
+#include <numeric>
 
 BspManager& BspManager::GetInstance()
 {
@@ -39,6 +40,9 @@ void BspManager::Generate(Map& map, const Params& p)
 
     // 디버그: 방 경계 벽 마킹 (복도 벽과 색상 구분용)
     MarkDebugRoomWalls(map);
+
+    // 방 타입 랜덤 배정
+    AssignRoomTypes(p);
 }
 
 //  BuildTree : 파티션을 재귀 분할해 BSP 트리 생성
@@ -267,6 +271,35 @@ void BspManager::MarkDebugRoomWalls(Map& map)
                 map.SetDebugRoomWall(rightCol, y, true);
         }
     }
+}
+
+// AssignRoomTypes : rooms[0] = Start, rooms.back() = Stair,
+//                   나머지를 셔플 후 Boss → Elite → Treasure → Normal 순으로 배정
+void BspManager::AssignRoomTypes(const Params& p)
+{
+    if (rooms.empty()) return;
+
+    rooms.front().type = RoomType::Start;
+    if (rooms.size() == 1) return;
+    rooms.back().type = RoomType::Stair;
+
+    // 중간 방 인덱스 풀 수집 후 셔플
+    std::vector<int> pool;
+    pool.resize(rooms.size() - 2);
+    std::iota(pool.begin(), pool.end(), 1);   // 1 ~ rooms.size()-2
+    std::shuffle(pool.begin(), pool.end(), rng);
+
+    int idx = 0;
+    auto assign = [&](RoomType t, int count)
+    {
+        for (int i = 0; i < count && idx < (int)pool.size(); ++i, ++idx)
+            rooms[pool[idx]].type = t;
+    };
+
+    assign(RoomType::Boss,     p.bossRoomCount);
+    assign(RoomType::Elite,    p.eliteRoomCount);
+    assign(RoomType::Treasure, p.treasureRoomCount);
+    // 나머지는 생성 시 기본값인 Normal 유지
 }
 
 void BspManager::FreeTree(BspNode* node)
