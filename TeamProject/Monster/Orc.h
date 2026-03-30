@@ -4,6 +4,6 @@
 class Orc :public Monster
 {
 public:
-    Orc();
+    Orc(bool _elite);
 };
 

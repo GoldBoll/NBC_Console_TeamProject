@@ -1,4 +1,4 @@
-#include "BspManager.h"
+﻿#include "BspManager.h"
 #include <ctime>
 #include <algorithm>
 #include <numeric>

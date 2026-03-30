@@ -28,6 +28,7 @@ char Map::TileToChar(int x, int y) const
         case Tile::Chest:        return 'C';  // 보물 상자
         case Tile::Monster:      return 'M';  // 일반 몬스터
         case Tile::EliteMonster: return 'E';  // 엘리트 몬스터
+        case Tile::Boss:         return 'B';  // 보스
         case Tile::Door:         return '+';  // 문
         default:                 return ' ';
     }

@@ -18,11 +18,12 @@ protected:
     int exp;
     int x;
     int y;
+    bool isElite;
 
     MonsterState state = MonsterState::IDLE;
 
 public:
-    Monster(std::string _name, int _hp, int _power, int _speed, int _exp);
+    Monster(std::string _name, int _hp, int _power, int _speed, int _exp, bool _elite);
     virtual ~Monster() {};
 
     std::string GetName();

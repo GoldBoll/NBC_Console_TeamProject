@@ -1,9 +1,17 @@
 ﻿#include "Monster.h"
 #include <cstdlib>
 
-Monster::Monster(std::string _name, int _hp, int _atk, int _dex, int _exp)
-    :name(_name), hp(_hp), atk(_atk), dex(_dex), exp(_exp), x(0), y(0)
+Monster::Monster(std::string _name, int _hp, int _atk, int _dex, int _exp, bool _elite)
+    :name(_name), hp(_hp), atk(_atk), dex(_dex), exp(_exp), x(0), y(0), isElite(false)
 {
+    if (isElite)
+    {
+        name = "[Elite]" + _name;
+        hp = _hp * 2;
+        atk = _atk * 2;
+        dex = _dex * 2;
+        exp = _exp * 2;
+    }
 }
 
 std::string Monster::GetName()
@@ -79,6 +87,17 @@ void Monster::Move(int _x, int _y, Map& _map)
 
     if (_map.InBounds(nextX, nextY) && _map.GetTile(nextX, nextY) == Tile::Floor)
     {
+        if (_map.GetTile(x, y) == Tile::EliteMonster)
+        {
+            _map.SetTile(x, y, Tile::Floor);
+
+            x = nextX;
+            y = nextY;
+
+            _map.SetTile(x, y, Tile::EliteMonster);
+            return;
+        }
+
         _map.SetTile(x, y, Tile::Floor);
 
         x = nextX;

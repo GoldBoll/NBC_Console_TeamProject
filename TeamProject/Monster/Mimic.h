@@ -4,6 +4,6 @@
 class Mimic : public Monster
 {
 public:
-    Mimic();
+    Mimic(bool _elite);
 };
 

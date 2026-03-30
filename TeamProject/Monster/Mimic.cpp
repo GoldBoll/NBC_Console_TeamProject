@@ -1,7 +1,7 @@
 ﻿#include "Mimic.h"
 #include <iostream>
 
-Mimic::Mimic()
-    :Monster("미믹", 8, 9, 7, 7)
+Mimic::Mimic(bool _elite)
+    :Monster("미믹", 8, 9, 7, 7, _elite)
 {
 }

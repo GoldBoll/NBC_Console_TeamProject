@@ -4,6 +4,6 @@
 class Golem : public Monster
 {
 public:
-    Golem();
+    Golem(bool _elite);
 };
 

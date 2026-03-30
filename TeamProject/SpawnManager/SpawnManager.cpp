@@ -26,27 +26,69 @@ void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _roo
 {
     for (const auto& room : _roomList)
     {
+        if (room.type == RoomType::Start || room.type == RoomType::Stair) continue;
 
-        int monsterCount = (rand() % 4) + 1;
-
-        int spawned = 0;
-        int attempts = 0;
-
-        while (spawned < monsterCount && attempts < 10)
+        /*if (room.type == RoomType::Boss)
         {
-            attempts++;
-
             int rx = room.x + 1 + (rand() % (room.w - 2));
             int ry = room.y + 1 + (rand() % (room.h - 2));
-
-            if (_map.GetTile(rx, ry) == Tile::Floor)
+            int spawned = 0;
+            while (spawned < 1)
             {
-                Monster* newMonster = new Goblin();
-                newMonster->SetPosition(rx, ry);
-                activeMonsters.push_back(newMonster);
-                _map.SetTile(rx, ry, Tile::Monster);
+                if (_map.GetTile(rx, ry) == Tile::Floor)
+                {
+                    Monster* newBossMonster = new Goblin(true);
+                    newBossMonster->SetPosition(rx, ry);
+                    activeMonsters.push_back(newBossMonster);
+                    _map.SetTile(rx, ry, Tile::Boss);
+                    spawned++;
+                }
+            }
+            continue;
+        }*/
 
-                spawned++;
+        else if (room.type == RoomType::Treasure || room.type == RoomType::Elite)
+        {
+            int rx = room.x + 1 + (rand() % (room.w - 2));
+            int ry = room.y + 1 + (rand() % (room.h - 2));
+            int spawned = 0;
+            while (spawned < 1)
+            {
+                if (_map.GetTile(rx, ry) == Tile::Floor)
+                {
+                    Monster* newEliteMonster = new Goblin(true);
+                    newEliteMonster->SetPosition(rx, ry);
+                    activeMonsters.push_back(newEliteMonster);
+                    _map.SetTile(rx, ry, Tile::EliteMonster);
+                    spawned++;
+                }
+            }
+            continue;
+        }
+        
+        else if (room.type == RoomType::Normal)
+        {
+            int monsterCount = (rand() % 4) + 1;
+
+            int spawned = 0;
+            int attempts = 0;
+
+            while (spawned < monsterCount && attempts < 10)
+            {
+                attempts++;
+
+                int rx = room.x + 1 + (rand() % (room.w - 2));
+                int ry = room.y + 1 + (rand() % (room.h - 2));
+
+                if (_map.GetTile(rx, ry) == Tile::Floor)
+                {
+                    Monster* newMonster = new Goblin(false);
+                    newMonster->SetPosition(rx, ry);
+                    activeMonsters.push_back(newMonster);
+                    _map.SetTile(rx, ry, Tile::Monster);
+
+                    spawned++;
+                }
             }
         }
     }

@@ -4,5 +4,5 @@
 class Goblin : public Monster
 {
 public:
-    Goblin();
+    Goblin(bool _elite);
 };
