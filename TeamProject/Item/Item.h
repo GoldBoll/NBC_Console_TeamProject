@@ -18,8 +18,10 @@ struct Item
     ItemType type;
     bool isConsumable;
 
+    int count;
+
     Item(int code, std::string n, std::string desc, ItemType t, bool consumable)
-        : itemCode(code), name(n), description(desc), type(t), isConsumable(consumable) {}
+        : itemCode(code), name(n), description(desc), type(t), isConsumable(consumable), count(1) {}
 
     virtual ~Item() {}
 

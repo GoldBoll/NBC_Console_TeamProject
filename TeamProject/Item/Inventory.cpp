@@ -24,12 +24,23 @@ bool Inventory::AddItem(Item* newItem)
 {
     if (newItem == nullptr) return false;
 
+    // 같은 itemCode가 있으면 스택
+    for (int i = 0; i < MAX_SLOTS; i++)
+    {
+        if (slots[i] != nullptr && slots[i]->itemCode == newItem->itemCode)
+        {
+            slots[i]->count++;
+            delete newItem;
+            return true;
+        }
+    }
+
+    // 빈 슬롯에 추가
     for (int i = 0; i < MAX_SLOTS; i++)
     {
         if (slots[i] == nullptr)
         {
             slots[i] = newItem;
-            //std::cout << "[시스템] 아이템을 획득했습니다! (슬롯: " << i << ")\n";
             return true;
         }
     }
@@ -47,6 +58,11 @@ bool Inventory::UseItem(int index, Player& player)
 
     if (slots[index]->isConsumable)
     {
+        if (slots[index]->count > 1)
+        {
+            slots[index]->count--;
+            return true;
+        }
         return RemoveItem(index);
     }
     //std::cout << "[시스템] " << index << "번 슬롯의 아이템을 사용했습니다.\n";
