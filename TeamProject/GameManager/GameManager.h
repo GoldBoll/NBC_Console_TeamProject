@@ -6,6 +6,7 @@
 #include "../Monster/Monster.h"
 #include "../GameManager/InputManager.h"
 #include "../Battle/Battle.h"
+#include "../Item/ItemManager.h"
 
 class GameManager
 {
@@ -20,6 +21,7 @@ public:
 
     int GetCurrentStageIndex() const { return curStage; }
     void SetCurrentStageIndex(int stage) { curStage = stage; }
+    Map& GetMap() { return map; }
 
 private:
     GameManager();
@@ -27,25 +29,18 @@ private:
     void HandleAction(GameAction action);
     void UpdateMonster();
     void ProcessBattle();
-
-    void OpenInventory();
-    void CloseInventory();
-    void HandleInventoryAction(GameAction action);
-
-
+    void SceneChange(int stage);
 
     Map                  map;
     Player*              player;
     std::vector<Monster*> monsters;
-    bool                 running     = false;
-    bool                 needsRedraw = false;
-    bool                 inputbutton = false;
-    bool                 isBattleMode = false;
+    bool                 running        = false;
+    bool                 needsRedraw    = false;
+    bool                 inputbutton    = false;
+    bool                 isBattleMode   = false;
     bool                 isNextMoveDash = false;
-    Monster*             battleTarget = nullptr;
+    Monster*             battleTarget   = nullptr;
     Battle               battle;
-    bool                inventoryOpen    = false;
-    int                 invSelectedIdx   = 0;
-    int                 invScrollOffset  = 0;
-    int                 curStage         = 1;
+    ItemManager&         itemMgr        = ItemManager::GetInstance();
+    int                  curStage       = 1;
 };

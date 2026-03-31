@@ -54,8 +54,11 @@ public:
     void SetState(MonsterState _state) { state = _state; }
 
     // Actions
-    void TakeDamage(int _damage);
+
+   
     virtual void Move(int _x, int _y, Map& _map);
+
+    void TakeDamage(int _damage, int attackerDex = 0);
     void UpdateAI(Map& _map);
 
     void Update(int playerX, int playerY, Map& _map);

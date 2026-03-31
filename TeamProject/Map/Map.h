@@ -82,6 +82,9 @@ public:
 
     char TileToChar(int x, int y)           const;
 
+    // 보스룸: 100x100 전체 Wall, 중앙 20x20만 Floor
+    void GenerateBossRoom();
+
     //레거시 코드
     //void LoadStage1();
     //void DrawViewport(const Player& player) const;

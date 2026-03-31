@@ -35,6 +35,21 @@ char Map::TileToChar(int x, int y) const
     }
 }
 
+void Map::GenerateBossRoom()
+{
+    // 전체를 Wall로 채움
+    Fill(Tile::Wall);
+
+    // 중앙 20x20 영역을 Floor로 설정
+    // 100x100 맵 기준 중앙: x [40..59], y [40..59]
+    const int startX = (MAP_W - 20) / 2;
+    const int startY = (MAP_H - 20) / 2;
+
+    for (int y = startY; y < startY + 20; ++y)
+        for (int x = startX; x < startX + 20; ++x)
+            SetTile(x, y, Tile::Floor);
+}
+
 // void Map::LoadStage1()
 // {
 //     // ── 1. 전체 Floor 로 초기화 ──────────────────────────────────────────────

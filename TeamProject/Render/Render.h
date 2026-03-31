@@ -45,6 +45,7 @@ public:
     void RenderInventory(const Inventory& inv, int selectedIdx, int scrollOffset);
     void RenderItemDesc(const Item* item);
     void ClearInfo2();
+    void ShowReviveToken();
 
     Render(const Render&)            = delete;
     Render& operator=(const Render&) = delete;

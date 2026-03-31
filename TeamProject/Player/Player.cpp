@@ -46,6 +46,21 @@ void Player::SetDex(int _dex) { dex = _dex; }
 //    cout << "------------------------------------" << endl;
 //}
 
+void Player::TickInvisibility()
+{
+    if (invisibilityTurns <= 0) return;
+    --invisibilityTurns;
+    if (invisibilityTurns == 0)
+        Render::GetInstance().AddLog("투명화가 해제됐습니다.", CLR_DARK_GRAY);
+}
+
+void Player::Heal(int amount)
+{
+    hp += amount;
+    if (hp > maxHp) hp = maxHp;
+    Render::GetInstance().AddLog("체력이 " + std::to_string(amount) + " 회복됐습니다! (" + std::to_string(hp) + "/" + std::to_string(maxHp) + ")", CLR_GREEN);
+}
+
 void Player::GainExp(int _exp)
 {
     exp += _exp;
@@ -100,6 +115,14 @@ void Player::TakeDamage(int _damage, int attackerDex)
 
         hp -= damageAfterDef;
         Render::GetInstance().AddLog("당신은 " + std::to_string(damageAfterDef) + "의 데미지를 입었습니다!", CLR_RED);
+
+        if (hp <= 0 && hasReviveToken)
+        {
+            hasReviveToken = false;
+            hp = maxHp / 2;
+            Render::GetInstance().AddLog("부활 토큰 발동! 체력 " + std::to_string(hp) + "으로 부활!", CLR_YELLOW);
+            Render::GetInstance().ClearInfo2();
+        }
     }
     else
     {
@@ -125,43 +148,19 @@ bool Player::Attack(Monster* target)
 {
     if (!target) return false;
 
-    int playerDex = this->dex;
-    int monsterDex = target->GetDex();
+    // 공격 시도 시, 수치 계산 없이 전달만 함 (TakeDamage에서 통합 처리)
+    target->TakeDamage(this->atk, this->dex);
 
-    // 명중률 계산: 무기 명중률 + (공격자 DEX - 방어자 DEX) × 2
-    int finalHitRate = equippedWeaponHit + (playerDex - monsterDex) * 2;
-
-    if (finalHitRate < 5) finalHitRate = 5;
-    else if (finalHitRate > 95) finalHitRate = 95;
-
-    int roll = std::rand() % 100;
-
-    if (roll < finalHitRate)
+    if (target->IsDead())
     {
-        // 몬스터의 방어력 계산
-        // 최종 데미지 = (공격력 × 무기배율) × (1.0 - (방어력 × 0.03))
-        int monsterDef = target->GetDef();
-        int damage = static_cast<int>(this->atk * (1.0 - (monsterDef * 0.03)));
+        int monsterExp = target->GetExp();
+        this->GainExp(monsterExp);
 
-        target->TakeDamage(damage);
-
-        Render::GetInstance().AddLog(target->GetName() + "에게 " + std::to_string(damage) + "의 데미지!", CLR_WHITE);
-
-        if (target->IsDead())
-        {
-            int monsterExp = target->GetExp();
-            this->GainExp(monsterExp);
-
-            Render::GetInstance().AddLog(target->GetName() + "을(를) 처치하여 " + std::to_string(monsterExp) + " EXP 획득!", CLR_YELLOW);
-        }
-
-        return true;
+        Render::GetInstance().AddLog(target->GetName() + "을(를) 처치하여 " + std::to_string(monsterExp) + " EXP 획득!", CLR_YELLOW);
+        GetInventory().AddItem(ItemManager::GetInstance().CreateRandomItem());
     }
-    else
-    {
-        Render::GetInstance().AddLog(target->GetName() + "에게 공격이 빗나갔습니다!", CLR_DARK_GRAY);
-        return false;
-    }
+
+    return true;
 }
 
 bool Player::Move(GameAction _action, Map& _map)
@@ -248,6 +247,13 @@ void Player::OnCollision(Tile targetTile, int targetX, int targetY, Map& _map)
 
         // 아이템 상자 획득 처리해야함
         _map.SetTile(targetX, targetY, Tile::Floor);
+        Item* item = ItemManager::GetInstance().CreateRandomItem();
+        if (item)
+        {
+            std::string itemName = item->GetName();
+            inventory.AddItem(item);
+            render.AddLog("보물상자에서 [" + itemName + "] 을(를) 획득했습니다!", CLR_YELLOW);
+        }
         break;
     }
     case Tile::Stair:

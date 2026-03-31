@@ -6,9 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
-#include "../Item/HealPotion.h"
-#include "../Item/InvisibilityItem.h"
-#include "../Item/TeleportPotion.h"
+#include "../Item/ItemManager.h"
 #include "../SpawnManager/SpawnManager.h"
 
 // 수동 클램프 함수
@@ -38,28 +36,10 @@ void GameManager::Init(int stage)
     Render& render = Render::GetInstance();
     render.Init("TextRPG - NBC Team Project 2");
 
-    //아이템 출력확인
-    player->GetInventory().AddItem(new HealPotion());
-    player->GetInventory().AddItem(new HealPotion());
-    player->GetInventory().AddItem(new InvisibilityItem());
-    player->GetInventory().AddItem(new TeleportPotion());
+    SceneChange(stage);
 
-    // BSP 맵 생성
-    BspManager::Params bspParams;
-    BspManager::GetInstance().Generate(map, bspParams);
-
-    const std::vector<Room>& rooms = BspManager::GetInstance().GetRooms();
-
-    // 플레이어 스폰
-    SpawnManager::GetInstance()->SpawnPlayerInRooms(map, rooms, player);
-
-    // 오브젝트 스폰
-    SpawnManager::GetInstance()->SpawnObjectInRooms(map, rooms);
-
-    // 몬스터 스폰
-    SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms);
-    // 몬스터 목록 가져오기
-    monsters = SpawnManager::GetInstance()->GetActiveMonsters();
+    // 예시: 랜덤 아이템 지급
+    //player->GetInventory().AddItem(itemMgr.CreateItemByCode(105));
 
     render.DrawStaticUI();
     render.RenderHelp();
@@ -136,7 +116,7 @@ void GameManager::Run()
         if (needsRedraw)
         {
             render.RenderMap(map, player, monsters);
-            if (!inventoryOpen)
+            if (!ItemManager::GetInstance().IsOpen())
                 render.RenderInfo(player);
             render.RenderLog();
             needsRedraw = false;
@@ -203,12 +183,12 @@ void GameManager::HandleAction(GameAction action)
     }
 
     // 인벤토리가 열려있으면 인벤토리 입력 처리
-    if (inventoryOpen)
+    if (ItemManager::GetInstance().IsOpen())
     {
         if (action == GameAction::Inventory)
-            CloseInventory();
+            ItemManager::GetInstance().CloseInventory(player);
         else
-            HandleInventoryAction(action);
+            ItemManager::GetInstance().HandleInventoryAction(action, player, isBattleMode);
         return;
     }
 
@@ -234,7 +214,7 @@ void GameManager::HandleAction(GameAction action)
         switch (action)
         {
         case GameAction::Inventory:
-            OpenInventory();
+            ItemManager::GetInstance().OpenInventory(player);
             return;
 
         case GameAction::Dash:
@@ -267,6 +247,8 @@ void GameManager::HandleAction(GameAction action)
 
         inputbutton = true;
 
+        player->TickInvisibility();
+
         for (Monster* m : monsters)
         {
             if (m && !m->IsDead()) m->Update(player->GetX(), player->GetY(), map);
@@ -278,6 +260,43 @@ void GameManager::HandleAction(GameAction action)
         monsters = SpawnManager::GetInstance()->GetActiveMonsters();
 
         needsRedraw = true;
+    }
+}
+
+void GameManager::SceneChange(int stage)
+{
+    if (stage >= 4)
+    {
+        // 보스룸: 중앙 20x20 Floor, 나머지 Wall
+        map.GenerateBossRoom();
+
+        // 플레이어를 보스룸 중앙에 배치
+        const int bossRoomCenterX = MAP_W / 2;
+        const int bossRoomCenterY = MAP_H / 2;
+        player->SetX(bossRoomCenterX);
+        player->SetY(bossRoomCenterY);
+        map.SetTile(bossRoomCenterX, bossRoomCenterY, Tile::Player);
+
+        monsters.clear();
+    }
+    else
+    {
+        // BSP 맵 생성
+        BspManager::Params bspParams;
+        BspManager::GetInstance().Generate(map, bspParams);
+
+        const std::vector<Room>& rooms = BspManager::GetInstance().GetRooms();
+
+        // 플레이어 스폰
+        SpawnManager::GetInstance()->SpawnPlayerInRooms(map, rooms, player);
+
+        // 오브젝트 스폰
+        SpawnManager::GetInstance()->SpawnObjectInRooms(map, rooms);
+
+        // 몬스터 스폰
+        SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms);
+        // 몬스터 목록 가져오기
+        monsters = SpawnManager::GetInstance()->GetActiveMonsters();
     }
 }
 
@@ -314,84 +333,3 @@ void GameManager::ProcessBattle()
     }
 }
 
-void GameManager::OpenInventory()
-{
-    inventoryOpen   = true;
-    invSelectedIdx  = 0;
-    invScrollOffset = 0;
-
-    Render& render = Render::GetInstance();
-    render.RenderInventory(player->GetInventory(), invSelectedIdx, invScrollOffset);
-
-    auto items = player->GetInventory().GetFilledItems();
-    const Item* sel = items.empty() ? nullptr : items[0].second;
-    render.RenderItemDesc(sel);
-}
-
-void GameManager::CloseInventory()
-{
-    inventoryOpen   = false;
-    invSelectedIdx  = 0;
-    invScrollOffset = 0;
-
-    Render& render = Render::GetInstance();
-    render.RenderInfo(player);
-    render.ClearInfo2();
-}
-
-void GameManager::HandleInventoryAction(GameAction action)
-{
-    Render& render  = Render::GetInstance();
-    const int maxVisible = PLAYER_INFO_H - 4;
-    auto items = player->GetInventory().GetFilledItems();
-
-    switch (action)
-    {
-    case GameAction::MoveUp:
-        if (invSelectedIdx > 0)
-        {
-            --invSelectedIdx;
-            if (invSelectedIdx < invScrollOffset)
-                --invScrollOffset;
-        }
-        break;
-
-    case GameAction::MoveDown:
-        if (invSelectedIdx < (int)items.size() - 1)
-        {
-            ++invSelectedIdx;
-            if (invSelectedIdx >= invScrollOffset + maxVisible)
-                ++invScrollOffset;
-        }
-        break;
-
-    case GameAction::UseItem:
-        if (!items.empty() && invSelectedIdx < (int)items.size())
-        {
-            int   slotIdx  = items[invSelectedIdx].first;
-            std::string itemName = items[invSelectedIdx].second->GetName();
-            player->GetInventory().UseItem(slotIdx, *player);
-            render.AddLog("Used: " + itemName, CLR_GREEN);
-
-            // 소모 후 선택 인덱스 보정
-            auto updated = player->GetInventory().GetFilledItems();
-            if (invSelectedIdx >= (int)updated.size())
-                invSelectedIdx = (int)updated.size() - 1;
-            if (invSelectedIdx < 0) invSelectedIdx = 0;
-            if (invScrollOffset > invSelectedIdx)
-                invScrollOffset = invSelectedIdx;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    // 패널 갱신
-    auto updated = player->GetInventory().GetFilledItems();
-    render.RenderInventory(player->GetInventory(), invSelectedIdx, invScrollOffset);
-    const Item* sel = (!updated.empty() && invSelectedIdx < (int)updated.size())
-        ? updated[invSelectedIdx].second : nullptr;
-    render.RenderItemDesc(sel);
-    render.RenderLog();
-}
