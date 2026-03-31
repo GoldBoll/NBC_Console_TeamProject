@@ -482,6 +482,57 @@ void Render::RenderItemDesc(const Item* item)
     ResetColor();
 }
 
+void Render::RenderMonsterInfo(const Monster* monster)
+{
+    if (!monster) return;
+
+    ClearRegion(INFO2_BOX_X + 1, INFO2_BOX_Y + 1, MID_BOX_W - 2, INFO2_H - 2);
+
+    int y = INFO2_BOX_Y + 1;
+    int barLen = MID_BOX_W - 6;
+
+    // 이름
+    if (monster->IsElite()) SetColor(CLR_MAGENTA);
+    else SetColor(CLR_RED);
+    GotoXY(INFO2_BOX_X + 1, y++);
+    std::cout << monster->GetName();
+
+    SetColor(CLR_DARK_GRAY);
+    GotoXY(INFO2_BOX_X + 1, y++);
+    std::cout << (monster->IsElite() ? "[Elite Enemy]" : "[Normal Enemy]");
+
+    y++;
+
+    // HP Bar
+    int filled = (monster->GetMaxHP() > 0)
+        ? (int)((float)monster->GetHP() / monster->GetMaxHP() * barLen)
+        : 0;
+    filled = std::max(0, std::min(filled, barLen));
+
+    SetColor(CLR_GRAY);
+    GotoXY(INFO2_BOX_X + 1, y);
+    std::cout << "HP ";
+    SetColor(CLR_RED);
+    for (int i = 0; i < filled; ++i)        std::cout << '#';
+    SetColor(CLR_DARK_GRAY);
+    for (int i = filled; i < barLen; ++i)   std::cout << '-';
+
+    SetColor(CLR_GRAY);
+    GotoXY(INFO2_BOX_X + 1, ++y);
+    std::cout << monster->GetHP() << "/" << monster->GetMaxHP();
+
+    y += 2;
+    SetColor(CLR_GRAY);
+    GotoXY(INFO2_BOX_X + 1, y++);
+    std::cout << "ATK: " << monster->GetAtk();
+    GotoXY(INFO2_BOX_X + 1, y++);
+    std::cout << "DEF: " << monster->GetDef();
+    GotoXY(INFO2_BOX_X + 1, y++);
+    std::cout << "DEX: " << monster->GetDex();
+
+    ResetColor();
+}
+
 void Render::ClearInfo2()
 {
     ClearRegion(INFO2_BOX_X + 1, INFO2_BOX_Y + 1, MID_BOX_W - 2, INFO2_H - 2);

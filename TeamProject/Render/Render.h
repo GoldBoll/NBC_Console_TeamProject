@@ -6,6 +6,9 @@
 #include <utility>
 #include "../Map/Map.h"
 #include "../Item/Inventory.h"
+
+class Monster;
+class Player;
 // UILayout.h 는 Map.h → UILayout.h 경로로 이미 포함됩니다.
 
 // 콘솔 색상 (Windows 16색)
@@ -41,6 +44,7 @@ public:
     void RenderMap(const Map& map, const Player* player, const std::vector<Monster*>& monsters);
     void RenderInfo(Player* player);
     void RenderLog();
+    void RenderMonsterInfo(const Monster* monster);
     void AddLog(const std::string& msg, int color = CLR_GREEN);
     void RenderInventory(const Inventory& inv, int selectedIdx, int scrollOffset);
     void RenderItemDesc(const Item* item);

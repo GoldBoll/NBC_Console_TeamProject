@@ -15,6 +15,7 @@ class Monster
 protected:
     std::string name;
     int hp;
+    int maxHp;
     int atk;
     int def;
     int dex;
@@ -34,6 +35,7 @@ public:
     // Getters
     std::string GetName()       const { return name; }
     int GetHP()                 const { return hp; }
+    int GetMaxHP()              const { return maxHp; }
     int GetAtk()                const { return atk; }
     int GetDef()                const { return def; }
     int GetDex()                const { return dex; }
