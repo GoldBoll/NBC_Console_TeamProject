@@ -21,6 +21,7 @@ public:
 
     int GetCurrentStageIndex() const { return curStage; }
     void SetCurrentStageIndex(int stage) { curStage = stage; }
+    Map& GetMap() { return map; }
 
 private:
     GameManager();

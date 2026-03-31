@@ -46,6 +46,8 @@ protected:
     int dashGauge = 0;
     const int maxDashGauge = 120;
     int equippedWeaponHit = 90;
+    int invisibilityTurns = 0;
+    bool hasReviveToken = false;
 
 public:
     Player(std::string _jobName);
@@ -83,7 +85,16 @@ public:
     void SetY(int _y) { y = _y; }
 
     // player info
-    bool IsAlive() const { return hp > 0; }
+    bool IsAlive()     const { return hp > 0; }
+    bool IsInvisible() const { return invisibilityTurns > 0; }
+    int  GetInvisibilityTurns() const { return invisibilityTurns; }
+
+    void SetInvisibility(int turns) { invisibilityTurns = turns; }
+    void TickInvisibility();
+
+    bool HasReviveToken()      const { return hasReviveToken; }
+    void ActivateReviveToken()       { hasReviveToken = true; }
+    void ConsumeReviveToken()        { hasReviveToken = false; }
     //void PrintStatus() const;
 
     void Heal(int amount);

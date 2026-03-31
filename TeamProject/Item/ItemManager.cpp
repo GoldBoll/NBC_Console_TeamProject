@@ -18,16 +18,16 @@ Item* ItemManager::CreateRandomItem()
 {
     static const std::vector<std::function<Item*()>> allItems =
     {
-        [] { return new HealPotion();      },
-        [] { return new TeleportPotion();  },
-        [] { return new InvisibilityItem();},
-        [] { return new ShieldItem();      },
-        [] { return new ReviveToken();     },
-        [] { return new Bomb();            },
-        [] { return new VampireItem();     },
-        [] { return new StunItem();        },
-        [] { return new DuplicateItem();   },
-        [] { return new RageItem();        },
+        [] { return new HealPotion();      },  // 101
+        [] { return new TeleportPotion();  },  // 102
+        [] { return new InvisibilityItem();},  // 103
+        //[] { return new ShieldItem();      },  // 104 - 미구현
+        [] { return new ReviveToken();     },  // 105
+        //[] { return new Bomb();            },  // 106 - 미구현
+        //[] { return new VampireItem();     },  // 107 - 미구현
+        //[] { return new StunItem();        },  // 108 - 미구현
+        //[] { return new DuplicateItem();   },  // 109 - 미구현
+        //[] { return new RageItem();        },  // 110 - 미구현
     };
     return allItems[rand() % allItems.size()]();
 }
@@ -49,16 +49,34 @@ Item* ItemManager::CreateItemByType(ItemType type)
     {
         static const std::vector<std::function<Item*()>> etc =
         {
-            [] { return new InvisibilityItem(); },
-            [] { return new ShieldItem();       },
-            [] { return new ReviveToken();      },
-            [] { return new Bomb();             },
-            [] { return new VampireItem();      },
-            [] { return new StunItem();         },
-            [] { return new DuplicateItem();    },
-            [] { return new RageItem();         },
+            [] { return new InvisibilityItem(); },  // 103
+            //[] { return new ShieldItem();       },  // 104 - 미구현
+            [] { return new ReviveToken();      },  // 105
+            //[] { return new Bomb();             },  // 106 - 미구현
+            //[] { return new VampireItem();      },  // 107 - 미구현
+            //[] { return new StunItem();         },  // 108 - 미구현
+            //[] { return new DuplicateItem();    },  // 109 - 미구현
+            //[] { return new RageItem();         },  // 110 - 미구현
         };
         return etc[rand() % etc.size()]();
+    }
+}
+
+Item* ItemManager::CreateItemByCode(int code)
+{
+    switch (code)
+    {
+    case 101: return new HealPotion();
+    case 102: return new TeleportPotion();
+    case 103: return new InvisibilityItem();
+    //case 104: return new ShieldItem();      // 미구현
+    case 105: return new ReviveToken();
+    //case 106: return new Bomb();            // 미구현
+    //case 107: return new VampireItem();     // 미구현
+    //case 108: return new StunItem();        // 미구현
+    //case 109: return new DuplicateItem();   // 미구현
+    //case 110: return new RageItem();        // 미구현
+    default:  return nullptr;
     }
 }
 
@@ -86,7 +104,11 @@ void ItemManager::CloseInventory(Player* player)
 
     Render& render = Render::GetInstance();
     render.RenderInfo(player);
-    render.ClearInfo2();
+
+    if (player->HasReviveToken())
+        render.ShowReviveToken();
+    else
+        render.ClearInfo2();
 }
 
 void ItemManager::HandleInventoryAction(GameAction action, Player* player, bool isBattleMode)

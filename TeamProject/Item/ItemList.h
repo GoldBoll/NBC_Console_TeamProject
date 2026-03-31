@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Item.h"
-#include "../Player/Player.h"
 
 // ================================================================
 // 아이템 목록
@@ -15,10 +14,7 @@ public:
     HealPotion()
         : Item(101, "회복 물약", "체력을 회복합니다.", ItemType::POTION, true, UseContext::BOTH) {}
 
-    void Use(Player& player) override
-    {
-        player.Heal(10);
-    }
+    void Use(Player& player) override; // 구현: ItemEffects.cpp
 };
 
 // 102 - 랜덤 이동 물약 (비전투 중에만 사용 가능)
@@ -28,7 +24,7 @@ public:
     TeleportPotion()
         : Item(102, "랜덤 이동 물약", "맵 내 랜덤 위치로 순간이동합니다.", ItemType::POTION, true, UseContext::FIELD_ONLY) {}
 
-    void Use(Player& player) override {}
+    void Use(Player& player) override; // 구현: ItemEffects.cpp
 };
 
 // 103 - 투명화 아이템 (비전투 중에만 사용 가능)
@@ -38,7 +34,7 @@ public:
     InvisibilityItem()
         : Item(103, "투명화 아이템", "일정 턴 동안 몬스터의 탐지를 회피합니다.", ItemType::ETC, true, UseContext::FIELD_ONLY) {}
 
-    void Use(Player& player) override {}
+    void Use(Player& player) override; // 구현: ItemEffects.cpp
 };
 
 // 104 - 보호막 (전투 중에만 사용 가능)
@@ -51,17 +47,18 @@ public:
     void Use(Player& player) override {}
 };
 
-// 105 - 부활 토큰 (전투 중에만 사용 가능)
+// 105 - 부활 토큰 (전투 / 비전투 모두 사용 가능)
 class ReviveToken : public Item
 {
 public:
     ReviveToken()
-        : Item(105, "부활 토큰", "최대 체력 50%로 1회 부활합니다.", ItemType::ETC, true, UseContext::COMBAT_ONLY) {}
+        : Item(105, "부활 토큰", "최대 체력 50%로 1회 부활합니다.", ItemType::ETC, true, UseContext::BOTH) {}
 
-    void Use(Player& player) override {}
+    void Use(Player& player) override; // 구현: ItemEffects.cpp
 };
 
 // 106 - 폭탄 (전투 중에만 사용 가능)
+// 1:1 전투방식 구현으로 인해 범위 공격 효과는 일단 구현하지 않음
 class Bomb : public Item
 {
 public:

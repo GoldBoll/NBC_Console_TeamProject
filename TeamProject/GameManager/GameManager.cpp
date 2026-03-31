@@ -38,10 +38,8 @@ void GameManager::Init(int stage)
 
     SceneChange(stage);
 
-    // 예시: 랜덤 아이템 3개 지급
-    player->GetInventory().AddItem(itemMgr.CreateRandomItem());
-    player->GetInventory().AddItem(itemMgr.CreateRandomItem());
-    player->GetInventory().AddItem(itemMgr.CreateRandomItem());
+    // 예시: 랜덤 아이템 지급
+    //player->GetInventory().AddItem(itemMgr.CreateItemByCode(105));
 
     render.DrawStaticUI();
     render.RenderHelp();
@@ -248,6 +246,8 @@ void GameManager::HandleAction(GameAction action)
         }
 
         inputbutton = true;
+
+        player->TickInvisibility();
 
         for (Monster* m : monsters)
         {

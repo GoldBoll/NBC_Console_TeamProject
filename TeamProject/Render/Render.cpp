@@ -466,3 +466,16 @@ void Render::ClearInfo2()
 {
     ClearRegion(INFO2_BOX_X + 1, INFO2_BOX_Y + 1, MID_BOX_W - 2, INFO2_H - 2);
 }
+
+void Render::ShowReviveToken()
+{
+    ClearRegion(INFO2_BOX_X + 1, INFO2_BOX_Y + 1, MID_BOX_W - 2, INFO2_H - 2);
+
+    int y = INFO2_BOX_Y + 1;
+    SetColor(CLR_YELLOW);
+    GotoXY(INFO2_BOX_X + 1, y++);
+    std::cout << "[ 부활 토큰 활성화 ]";
+    ++y;
+
+    ResetColor();
+}
