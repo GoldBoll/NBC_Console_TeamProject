@@ -90,25 +90,6 @@ bool Inventory::RemoveItem(int index)
     return true;
 }
 
-void Inventory::ShowInventory() const
-{
-    std::cout << "\n=== [ 달여우의 인벤토리 ] ===\n";
-    for (int i = 0; i < 20; i++)
-    {
-        if (i < 10) std::cout << "[0" << i << "] ";
-        else std::cout << "[" << i << "] ";
-
-        if (slots[i] == nullptr)
-        {
-            std::cout << "--- (비어 있음) ---" << std::endl;
-        }
-        else {
-            std::cout << "★ " << slots[i]->GetName() << std::endl;
-        }
-    }
-    std::cout << "================================\n" << std::endl;
-}
-
 std::vector<std::pair<int, Item*>> Inventory::GetFilledItems() const
 {
     std::vector<std::pair<int, Item*>> result;
