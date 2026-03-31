@@ -158,13 +158,8 @@ void ItemManager::HandleInventoryAction(GameAction action, Player* player, bool 
             player->GetInventory().UseItem(slotIdx, *player);
             render.AddLog(itemName + " 사용!", CLR_GREEN);
 
-            // 소모 후 선택 인덱스 보정
-            auto updated = player->GetInventory().GetFilledItems();
-            if (invSelectedIdx >= (int)updated.size())
-                invSelectedIdx = (int)updated.size() - 1;
-            if (invSelectedIdx < 0) invSelectedIdx = 0;
-            if (invScrollOffset > invSelectedIdx)
-                invScrollOffset = invSelectedIdx;
+            CloseInventory(player);
+            return;
         }
         break;
 

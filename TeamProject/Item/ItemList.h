@@ -22,7 +22,7 @@ class TeleportPotion : public Item
 {
 public:
     TeleportPotion()
-        : Item(102, "랜덤 이동 물약", "맵 내 랜덤 위치로 순간이동합니다.", ItemType::POTION, true, UseContext::FIELD_ONLY) {}
+        : Item(102, "랜덤 이동 물약", "맵 내 랜덤 위치로 순간이동합니다.", ItemType::POTION, true, UseContext::BOTH) {}
 
     void Use(Player& player) override; // 구현: ItemEffects.cpp
 };
@@ -32,7 +32,7 @@ class InvisibilityItem : public Item
 {
 public:
     InvisibilityItem()
-        : Item(103, "투명화 아이템", "일정 턴 동안 몬스터의 탐지를 회피합니다.", ItemType::ETC, true, UseContext::FIELD_ONLY) {}
+        : Item(103, "투명화 아이템", "일정 턴 동안 몬스터의 탐지를 회피합니다.", ItemType::ETC, true, UseContext::BOTH) {}
 
     void Use(Player& player) override; // 구현: ItemEffects.cpp
 };
