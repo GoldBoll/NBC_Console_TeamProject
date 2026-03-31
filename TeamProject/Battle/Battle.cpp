@@ -22,9 +22,9 @@ void Battle::CheckCombat(Player* player, std::vector<Monster*>& monsters)
         MonsterState oldState = monster->GetState();
         MonsterState newState = oldState;
 
-        // 거리가 0일 때만 전투(COMBAT), 그 외 4칸 이내면 추격(CHASE)
-        if (dist == 0)      newState = MonsterState::COMBAT;
-        else if (dist <= 4) newState = MonsterState::CHASE;
+        // 거리가 1 이내면 전투(COMBAT), 그 외 3칸 이내면 추격(CHASE)
+        if (dist <= 1)      newState = MonsterState::COMBAT;
+        else if (dist <= 3) newState = MonsterState::CHASE;
         else                newState = MonsterState::IDLE;
 
         if (oldState != newState)
@@ -53,7 +53,7 @@ void Battle::ProcessTurn(Player* player, std::vector<Monster*>& monsters)
 
         int dist = static_cast<int>(std::max(std::abs(player->GetX() - monster->GetX()), std::abs(player->GetY() - monster->GetY())));
 
-        if (dist == 0)
+        if (dist == 1)
         {
             // 플레이어 공격
             player->Attack(monster);

@@ -1,4 +1,4 @@
-﻿#include "Player.h"
+#include "Player.h"
 #include "../Monster/Monster.h"
 #include "../Render/Render.h"
 #include <algorithm>
@@ -161,26 +161,19 @@ bool Player::Attack(Monster* target)
     }
 }
 
-void Player::Move(GameAction _action, Map& _map)
+bool Player::Move(GameAction _action, Map& _map)
 {
+    int dx = 0, dy = 0;
     switch (_action)
     {
-    case GameAction::MoveUp:
-        TileCheck(0, -1, _map);
-        break;
-
-    case GameAction::MoveDown:
-        TileCheck(0, 1, _map);
-        break;
-
-    case GameAction::MoveLeft:
-        TileCheck(-1, 0, _map);
-        break;
-
-    case GameAction::MoveRight:
-        TileCheck(1, 0, _map);
-        break;
+    case GameAction::MoveUp:    dy = -1; break;
+    case GameAction::MoveDown:  dy = 1;  break;
+    case GameAction::MoveLeft:  dx = -1; break;
+    case GameAction::MoveRight: dx = 1;  break;
+    default: return false;
     }
+
+    return TileCheck(dx, dy, _map);
 }
 
 bool Player::TileCheck(int _dx, int _dy, Map& _map)
@@ -188,22 +181,34 @@ bool Player::TileCheck(int _dx, int _dy, Map& _map)
     int nextX = x + _dx;
     int nextY = y + _dy;
 
+    if (!_map.InBounds(nextX, nextY)) return false;
+
     Tile targetTile = _map.GetTile(nextX, nextY);
 
-    if (targetTile == Tile::Floor)
+    // 몬스터 타일일 경우: 이동하지 않고 충돌 처리 (겹침 방지)
+    if (targetTile == Tile::Monster || targetTile == Tile::EliteMonster || targetTile == Tile::Boss)
     {
-        _map.SetTile(x, y, Tile::Floor);
-
-        x = nextX;
-        y = nextY;
-
-        _map.SetTile(x, y, Tile::Player);
+        OnCollision(targetTile);
         return true;
     }
 
-    if (targetTile != Tile::Wall)
+    // 이동 가능한 타일들 (빈 공간, 문, 계단, 상자 등)
+    if (targetTile == Tile::Floor || targetTile == Tile::Door || targetTile == Tile::Stair || targetTile == Tile::Chest)
     {
+        _map.SetTile(x, y, Tile::Floor);
+        x = nextX;
+        y = nextY;
+        _map.SetTile(x, y, Tile::Player);
+
         OnCollision(targetTile);
+        return true;
+    }
+
+    // 이동 불가 타일 (벽, 바위, 물 등)
+    // 벽에 부딪혀서 이동은 못했지만 턴이 지나간 것처럼 처리하기 위해 true 반환
+    if (targetTile == Tile::Wall || targetTile == Tile::Rock || targetTile == Tile::Water)
+    {
+        return true;
     }
 
     return false;
@@ -211,27 +216,30 @@ bool Player::TileCheck(int _dx, int _dy, Map& _map)
 
 void Player::OnCollision(Tile targetTile)
 {
+    Render& render = Render::GetInstance();
     switch (targetTile)
     {
     case Tile::Monster:
         // 배틀 매니저
-        Render::GetInstance().AddLog("몬스터", CLR_DARK_GRAY);
+        render.AddLog("몬스터", CLR_DARK_GRAY);
         break;
     case Tile::EliteMonster:
         // 배틀 매니저
-        Render::GetInstance().AddLog("엘리트 몬스터", CLR_DARK_GRAY);
+        render.AddLog("엘리트 몬스터", CLR_DARK_GRAY);
         break;
     case Tile::Boss:
         // 배틀 매니저
-        Render::GetInstance().AddLog("보스", CLR_DARK_GRAY);
+        render.AddLog("보스", CLR_DARK_GRAY);
         break;
     case Tile::Chest:
         // 아이템 매니저
-        Render::GetInstance().AddLog("보물상자", CLR_DARK_GRAY);
+        render.AddLog("보물상자", CLR_DARK_GRAY);
         break;
     case Tile::Stair:
         // 다음 층이동
-        Render::GetInstance().AddLog("계단", CLR_DARK_GRAY);
+        render.AddLog("계단", CLR_DARK_GRAY);
+        break;
+    default:
         break;
     }
 }

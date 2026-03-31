@@ -98,7 +98,7 @@ public:
 
     bool Attack(Monster* target);
     void DetectMonsters(std::vector<Monster*>& _monsters);
-    void Move(GameAction action, Map& _map);
+    bool Move(GameAction action, Map& _map);
     bool TileCheck(int _dx, int _dy, Map& _map);
     void OnCollision(Tile targetTile);
 };

@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include <vector>
 #include "../Map/Map.h"
-#include "../Player/Warrior.h"
 #include "../Player/Player.h"
+#include "../Player/Warrior.h"
 #include "../Monster/Monster.h"
 #include "../GameManager/InputManager.h"
 #include "../Battle/Battle.h"
