@@ -20,7 +20,6 @@ public:
     GameManager& operator=(const GameManager&) = delete;
 
     int GetCurrentStageIndex() const { return curStage; }
-    int GetCurrentStageIndex() const { return curStage; }
     void SetCurrentStageIndex(int stage) { curStage = stage; }
     Map& GetMap() { return map; }
 
