@@ -51,7 +51,7 @@ void Player::TickInvisibility()
     if (invisibilityTurns <= 0) return;
     --invisibilityTurns;
     if (invisibilityTurns == 0)
-        Render::GetInstance().AddLog("투명화가 해제됐습니다.", CLR_DARK_GRAY);
+    Render::GetInstance().AddLog("투명화가 해제됐습니다.", CLR_DARK_GRAY);
 }
 
 void Player::Heal(int amount)
@@ -115,7 +115,7 @@ void Player::TakeDamage(int _damage, int attackerDex)
         
         hp -= damageAfterDef;
         Render::GetInstance().AddLog(std::to_string(damageAfterDef) + "의 데미지를 입었습니다!", CLR_RED);
-
+        
         if (hp <= 0 && hasReviveToken)
         {
             hasReviveToken = false;
@@ -155,7 +155,7 @@ bool Player::Attack(Monster* target)
     {
         int monsterExp = target->GetExp();
         this->GainExp(monsterExp);
-
+        
         Render::GetInstance().AddLog(target->GetName() + "을(를) 처치하여 " + std::to_string(monsterExp) + " EXP 획득!", CLR_YELLOW);
         GetInventory().AddItem(ItemManager::GetInstance().CreateRandomItem());
     }
@@ -201,7 +201,7 @@ bool Player::TileCheck(int _dx, int _dy, Map& _map)
         x = nextX;
         y = nextY;
         _map.SetTile(x, y, Tile::Player);
-
+        
         OnCollision(targetTile, nextX, nextY, _map);
         return true;
     }
@@ -235,23 +235,25 @@ void Player::OnCollision(Tile targetTile, int targetX, int targetY, Map& _map)
         break;
         case Tile::Chest:
         // 아이템 매니저
-        render.AddLog("보물상자", CLR_DARK_GRAY);
-        Monster* m = SpawnManager::GetInstance()->GetMonsterAt(targetX, targetY);
-        if (m != nullptr)
         {
-            m->Interact();
-            _map.SetTile(targetX, targetY, Tile::Monster);
-            return;
-        }
-
-        // 아이템 상자 획득 처리해야함
-        _map.SetTile(targetX, targetY, Tile::Floor);
-        Item* item = ItemManager::GetInstance().CreateRandomItem();
-        if (item)
-        {
-            std::string itemName = item->GetName();
-            inventory.AddItem(item);
-            render.AddLog("보물상자에서 [" + itemName + "] 을(를) 획득했습니다!", CLR_YELLOW);
+            render.AddLog("보물상자", CLR_DARK_GRAY);
+            Monster* m = SpawnManager::GetInstance()->GetMonsterAt(targetX, targetY);
+            if (m != nullptr)
+            {
+                m->Interact();
+                _map.SetTile(targetX, targetY, Tile::Monster);
+                return;
+            }
+            
+            // 아이템 상자 획득 처리해야함
+            _map.SetTile(targetX, targetY, Tile::Floor);
+            Item* item = ItemManager::GetInstance().CreateRandomItem();
+            if (item)
+            {
+                std::string itemName = item->GetName();
+                inventory.AddItem(item);
+                render.AddLog("보물상자에서 [" + itemName + "] 을(를) 획득했습니다!", CLR_YELLOW);
+            }
         }
         break;
         case Tile::Stair:
