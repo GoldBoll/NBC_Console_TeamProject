@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "../Item/ItemManager.h"
 #include "../SpawnManager/SpawnManager.h"
+#include "../Monster/Boss.h"
 
 // 수동 클램프 함수
 template<typename T>
@@ -172,6 +173,7 @@ void GameManager::HandleAction(GameAction action)
                 render.AddLog("도망에 실패하여 공격당했습니다!", CLR_RED);
                 if (battleTarget && !battleTarget->IsDead()) battleTarget->Attack(player);
             }
+            inputbutton = true;
             break;
 
             case GameAction::Quit: running = false; break;
@@ -265,6 +267,7 @@ void GameManager::HandleAction(GameAction action)
 
 void GameManager::SceneChange(int stage)
 {
+    stage = 4;
     if (stage >= 4)
     {
         // 보스룸: 중앙 20x20 Floor, 나머지 Wall
@@ -276,8 +279,6 @@ void GameManager::SceneChange(int stage)
         player->SetX(bossRoomCenterX);
         player->SetY(bossRoomCenterY);
         map.SetTile(bossRoomCenterX, bossRoomCenterY, Tile::Player);
-
-        monsters.clear();
     }
     else
     {
@@ -294,7 +295,7 @@ void GameManager::SceneChange(int stage)
         SpawnManager::GetInstance()->SpawnObjectInRooms(map, rooms);
 
         // 몬스터 스폰
-        SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms);
+        SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms, stage);
         // 몬스터 목록 가져오기
         monsters = SpawnManager::GetInstance()->GetActiveMonsters();
     }

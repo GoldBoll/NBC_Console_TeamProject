@@ -15,6 +15,7 @@ private:
 
     std::vector<Monster*> activeMonsters;
 
+    int stage;
 public:
     static SpawnManager* GetInstance()
     {
@@ -24,9 +25,14 @@ public:
     ~SpawnManager();
 
     const std::vector<Monster*>& GetActiveMonsters() const;
-    void SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _rooms);
+    void SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _rooms, int _stage);
     void UpdateCleanup(Map& _map);
     void SpawnPlayerInRooms(Map& _map, const std::vector<Room>& _roomList, Player* player);
     void SpawnObjectInRooms(Map& _map, const std::vector<Room>& _roomList);
     Monster* GetMonsterAt(int targetX, int targetY);
+
+    void Stage1(Map& _map, const std::vector<Room>& _rooms);
+    void Stage2(Map& _map, const std::vector<Room>& _rooms);
+    void Stage3(Map& _map, const std::vector<Room>& _rooms);
+    void Stage4(Map& _map, const std::vector<Room>& _rooms);
 };

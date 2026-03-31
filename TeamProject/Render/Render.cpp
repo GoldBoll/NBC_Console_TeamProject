@@ -174,8 +174,10 @@ void Render::RenderMap(const Map& map, const Player* player, const std::vector<M
                 char glyph;
                 int color;
 
-                if(currentTile == Tile::Chest)
+                
+                if(currentTile == Tile::Chest) 
                 {
+                    // 미믹일 경우
                     glyph = 'C';
                     color = CLR_DARK_YELLOW;
                 }
@@ -184,8 +186,6 @@ void Render::RenderMap(const Map& map, const Player* player, const std::vector<M
                     glyph = monster->IsElite() ? 'E' : 'M';
                     color = monster->IsElite() ? CLR_MAGENTA : CLR_RED;
                 }
-                /*char glyph = monster->IsElite() ? 'E' : 'M';
-                int color = monster->IsElite() ? CLR_MAGENTA : CLR_RED;*/
 
                 if (monster->GetState() == MonsterState::CHASE)
                 {
