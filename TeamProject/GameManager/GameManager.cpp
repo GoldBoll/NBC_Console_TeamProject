@@ -31,7 +31,7 @@ GameManager::GameManager()
     player = new Warrior();
 }
 
-void GameManager::Init()
+void GameManager::Init(int stage)
 {
     srand((unsigned int)time(NULL));
 
@@ -64,8 +64,17 @@ void GameManager::Init()
     render.DrawStaticUI();
     render.RenderHelp();
 
-    render.AddLog("게임이 시작되었습니다!", CLR_YELLOW);
-    render.AddLog("WASD: 이동  |  `: 대쉬 활성화", CLR_GRAY);
+    if (stage < 1)
+    {
+        render.AddLog("게임이 시작되었습니다!", CLR_YELLOW);
+        render.AddLog("WASD: 이동  |  `: 대쉬 활성화", CLR_GRAY);
+    }
+
+    render.AddLog(std::to_string(stage) + "층 입니다.", CLR_YELLOW);
+
+    if (stage == 4)
+        render.AddLog("보스룸 입니다.", CLR_YELLOW);
+
 
     running        = true;
     needsRedraw    = true;
@@ -93,7 +102,7 @@ void GameManager::Init()
 
 void GameManager::Run()
 {
-    Init();
+    Init(1);
 
     Render&       render = Render::GetInstance();
     InputManager& input  = InputManager::GetInstance();
@@ -127,7 +136,8 @@ void GameManager::Run()
         if (needsRedraw)
         {
             render.RenderMap(map, player, monsters);
-            render.RenderInfo(player);
+            if (!inventoryOpen)
+                render.RenderInfo(player);
             render.RenderLog();
             needsRedraw = false;
         }
@@ -150,7 +160,7 @@ void GameManager::HandleAction(GameAction action)
 {
     Render& render = Render::GetInstance();
     bool moved = false;
-    inputbutton = true;
+    //inputbutton = true;
     // 전투 중 명령
     if (isBattleMode && battleTarget != nullptr)
     {
@@ -192,12 +202,26 @@ void GameManager::HandleAction(GameAction action)
         return;
     }
 
+    // 인벤토리가 열려있으면 인벤토리 입력 처리
+    if (inventoryOpen)
+    {
+        if (action == GameAction::Inventory)
+            CloseInventory();
+        else
+            HandleInventoryAction(action);
+        return;
+    }
+
     // 탐색 중 이동 - 대쉬 시 2칸 이동
     int moveDist = isNextMoveDash ? 2 : 1;
     int dx = 0, dy = 0;
 
     switch (action)
     {
+        case GameAction::Inventory:
+            OpenInventory();
+            return;
+
         case GameAction::Dash:
         if (player->CanDash())
         {
@@ -207,10 +231,22 @@ void GameManager::HandleAction(GameAction action)
         else render.AddLog("게이지가 부족합니다.", CLR_DARK_GRAY);
         break;
 
-        case GameAction::MoveUp:    player->Move(action, map); break;
-        case GameAction::MoveDown:  player->Move(action, map);  break;
-        case GameAction::MoveLeft:  player->Move(action, map); break;
-        case GameAction::MoveRight: player->Move(action, map);  break;
+        case GameAction::MoveUp:
+            {
+                player->Move(action, map);  inputbutton = true; break;
+            }
+        case GameAction::MoveDown:
+            {
+                player->Move(action, map);  inputbutton = true; break;
+            }
+        case GameAction::MoveLeft:
+            {
+                player->Move(action, map);  inputbutton = true; break;
+            }
+        case GameAction::MoveRight:
+            {
+                player->Move(action, map);  inputbutton = true; break;
+            }
         case GameAction::Help: render.AddLog("WASD: 이동 | `: 대쉬 | 1: 공격 | 2: 도망", CLR_CYAN); break;
         case GameAction::Quit: running = false; break;
         default: break;
