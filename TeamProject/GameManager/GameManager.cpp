@@ -66,23 +66,6 @@ void GameManager::Init(int stage)
     isBattleMode   = false;
     inputbutton    = false;
     isNextMoveDash = false;
-    
-    /*render.RenderMap(map, player, monsters);
-    render.RenderInfo(player);
-    render.RenderLog();*/
-    /*for (int y = 0; y < MAP_H; ++y)
-    {
-    for (int x = 0; x < MAP_W; ++x)
-    {
-    if (map.GetTile(x, y) == Tile::Monster)
-    {
-    Monster* monster = new Monster("Slime", 10, 1, 1, 10);
-    monster->SetPosition(x, y);
-    monsters.push_back(monster);
-    map.SetTile(x, y, Tile::Floor);
-    }
-    }
-    }*/
 }
 
 void GameManager::Run()
