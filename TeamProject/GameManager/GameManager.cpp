@@ -202,88 +202,39 @@ void GameManager::HandleAction(GameAction action)
         return;
     }
 
-    // 인벤토리가 열려있으면 인벤토리 입력 처리
-    if (inventoryOpen)
+    // 탐색 중 이동
+    if (action == GameAction::MoveUp || action == GameAction::MoveDown ||
+        action == GameAction::MoveLeft || action == GameAction::MoveRight)
     {
-        if (action == GameAction::Inventory)
-            CloseInventory();
-        else
-            HandleInventoryAction(action);
-        return;
-    }
-
-    // 탐색 중 이동 - 대쉬 시 2칸 이동
-    int moveDist = isNextMoveDash ? 2 : 1;
-    int dx = 0, dy = 0;
-
-    switch (action)
-    {
-        case GameAction::Inventory:
-            OpenInventory();
-            return;
-
-        case GameAction::Dash:
-        if (player->CanDash())
-        {
-            isNextMoveDash = true;
-            render.AddLog("대쉬 기운이 감돕니다!", CLR_YELLOW);
-        }
-        else render.AddLog("게이지가 부족합니다.", CLR_DARK_GRAY);
-        break;
-
-        case GameAction::MoveUp:
-            {
-                player->Move(action, map);  inputbutton = true; break;
-            }
-        case GameAction::MoveDown:
-            {
-                player->Move(action, map);  inputbutton = true; break;
-            }
-        case GameAction::MoveLeft:
-            {
-                player->Move(action, map);  inputbutton = true; break;
-            }
-        case GameAction::MoveRight:
-            {
-                player->Move(action, map);  inputbutton = true; break;
-            }
-        case GameAction::Help: render.AddLog("WASD: 이동 | `: 대쉬 | 1: 공격 | 2: 도망", CLR_CYAN); break;
-        case GameAction::Quit: running = false; break;
-        default: break;
-    }
-
-    // 이동 처리 (몬스터 충돌 감지 포함)
-    if (dx != 0 || dy != 0)
-    {
+        int moveDist = isNextMoveDash ? 2 : 1;
         for (int i = 0; i < moveDist; ++i)
         {
-            int nextX = ClampValue(player->GetX() + dx, 0, MAP_W - 1);
-            int nextY = ClampValue(player->GetY() + dy, 0, MAP_H - 1);
-
-            // 이동 경로 상에 몬스터가 있는지 즉시 체크
-            Monster* victim = nullptr;
-            for (Monster* m : monsters)
+            if (player->Move(action, map))
             {
-                if (m && !m->IsDead() && m->GetX() == nextX && m->GetY() == nextY)
-                {
-                    victim = m;
-                    break;
-                }
-            }
-
-            // 몬스터 발견 시 그 칸까지만 이동하고 루프 중단
-            if (victim)
-            {
-                player->SetX(nextX);
-                player->SetY(nextY);
                 moved = true;
-                break;
             }
+            else
+            {
+                break; // 벽이나 장애물에 막힘
+            }
+        }
+    }
+    else
+    {
+        switch (action)
+        {
+        case GameAction::Dash:
+            if (player->CanDash())
+            {
+                isNextMoveDash = true;
+                render.AddLog("대쉬 기운이 감돕니다!", CLR_YELLOW);
+            }
+            else render.AddLog("게이지가 부족합니다.", CLR_DARK_GRAY);
+            break;
 
-            // 몬스터가 없으면 이동 후 계속 진행 (대쉬일 경우 2번째 칸까지)
-            player->SetX(nextX);
-            player->SetY(nextY);
-            moved = true;
+        case GameAction::Help: render.AddLog("WASD:이동 | `:대쉬 | 1:공격 | 2:도망", CLR_CYAN); break;
+        case GameAction::Quit: running = false; break;
+        default: break;
         }
     }
 
@@ -332,7 +283,9 @@ void GameManager::ProcessBattle()
     for (Monster* m : monsters)
     {
         if (!m || m->IsDead()) continue;
-        if (m->GetX() == player->GetX() && m->GetY() == player->GetY())
+
+        int dist = std::max(std::abs(player->GetX() - m->GetX()), std::abs(player->GetY() - m->GetY()));
+        if (dist <= 1)
         {
             if (!isBattleMode)
             {
