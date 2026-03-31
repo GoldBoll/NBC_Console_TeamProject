@@ -125,7 +125,7 @@ void GameManager::Run()
             {
                 render.RenderMonsterInfo(battleTarget);
             }
-            else if (!inventoryOpen)
+            else if (!ItemManager::GetInstance().IsOpen())
             {
                 // 인벤토리도 아니고 전투도 아니면 Info2 비움
                 render.ClearInfo2();
