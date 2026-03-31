@@ -30,6 +30,7 @@ void GameManager::Init()
 
     //아이템 출력확인
     player->GetInventory().AddItem(new HealPotion());
+    player->GetInventory().AddItem(new HealPotion());
     player->GetInventory().AddItem(new InvisibilityItem());
     player->GetInventory().AddItem(new TeleportPotion());
 
