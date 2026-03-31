@@ -10,3 +10,8 @@ Goblin::Goblin(bool _elite)
              _elite)
 {
 }
+
+Tile Goblin::GetDisplayTile() const
+{
+    return isElite ? Tile::EliteMonster : Tile::Monster;
+}

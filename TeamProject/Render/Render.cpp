@@ -170,8 +170,22 @@ void Render::RenderMap(const Map& map, const Player* player, const std::vector<M
                 GotoXY(MAP_BOX_X + 1 + (mx - camX),
                 MAP_BOX_Y + 1 + (my - camY));
 
-                char glyph = monster->IsElite() ? 'E' : 'M';
-                int color = monster->IsElite() ? CLR_MAGENTA : CLR_RED;
+                Tile currentTile = monster->GetDisplayTile();
+                char glyph;
+                int color;
+
+                if(currentTile == Tile::Chest)
+                {
+                    glyph = 'C';
+                    color = CLR_DARK_YELLOW;
+                }
+                else
+                {
+                    glyph = monster->IsElite() ? 'E' : 'M';
+                    color = monster->IsElite() ? CLR_MAGENTA : CLR_RED;
+                }
+                /*char glyph = monster->IsElite() ? 'E' : 'M';
+                int color = monster->IsElite() ? CLR_MAGENTA : CLR_RED;*/
 
                 if (monster->GetState() == MonsterState::CHASE)
                 {

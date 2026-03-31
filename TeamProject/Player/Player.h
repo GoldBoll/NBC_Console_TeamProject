@@ -100,5 +100,5 @@ public:
     void DetectMonsters(std::vector<Monster*>& _monsters);
     bool Move(GameAction action, Map& _map);
     bool TileCheck(int _dx, int _dy, Map& _map);
-    void OnCollision(Tile targetTile);
+    void OnCollision(Tile targetTile, int _dx, int _dy, Map& _map);
 };

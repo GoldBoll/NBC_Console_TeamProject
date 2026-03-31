@@ -28,8 +28,6 @@ void Monster::Move(int _dx, int _dy, Map& _map)
     // 현재 위치와 다음 위치가 모두 유효해야 동작
     if (_map.InBounds(nextX, nextY) && _map.GetTile(nextX, nextY) == Tile::Floor)
     {
-        //Tile currentTile = _map.GetTile(x, y);
-
         // 이전 위치 타일 정리
         _map.SetTile(x, y, Tile::Floor);
 

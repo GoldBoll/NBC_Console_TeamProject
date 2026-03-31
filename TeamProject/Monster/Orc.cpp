@@ -10,3 +10,8 @@ Orc::Orc(bool _elite)
              _elite)
 {
 }
+
+Tile Orc::GetDisplayTile() const
+{
+    return isElite ? Tile::EliteMonster : Tile::Monster;
+}

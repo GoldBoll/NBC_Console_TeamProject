@@ -28,4 +28,5 @@ public:
     void UpdateCleanup(Map& _map);
     void SpawnPlayerInRooms(Map& _map, const std::vector<Room>& _roomList, Player* player);
     void SpawnObjectInRooms(Map& _map, const std::vector<Room>& _roomList);
+    Monster* GetMonsterAt(int targetX, int targetY);
 };

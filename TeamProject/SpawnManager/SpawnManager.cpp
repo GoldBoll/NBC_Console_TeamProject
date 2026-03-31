@@ -82,7 +82,7 @@ void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _roo
 
                     m->SetPosition(rx, ry);
                     activeMonsters.push_back(m);
-                    _map.SetTile(rx, ry, Tile::Monster);
+                    _map.SetTile(rx, ry, m->GetDisplayTile());
                 }
             }
         }
@@ -144,4 +144,16 @@ void SpawnManager::SpawnObjectInRooms(Map& _map, const std::vector<Room>& _roomL
             }
         }
     }
+}
+
+Monster* SpawnManager::GetMonsterAt(int targetX, int targetY)
+{
+    for (auto m : activeMonsters)
+    {
+        if (m->GetX() == targetX && m->GetY() == targetY)
+        {
+            return m;
+        }
+    }
+    return nullptr;
 }

@@ -283,7 +283,7 @@ void GameManager::HandleAction(GameAction action)
 
 void GameManager::UpdateMonster()
 {
-    //if (isBattleMode) return;
+    if (isBattleMode) return;
     for (Monster* m : monsters)
     {
         if (m && !m->IsDead()) m->UpdateAI(map);
