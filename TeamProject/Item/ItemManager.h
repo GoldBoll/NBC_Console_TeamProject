@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "ItemList.h"
 #include "../GameManager/InputManager.h"
 
@@ -12,9 +12,10 @@ public:
     ItemManager(const ItemManager&)            = delete;
     ItemManager& operator=(const ItemManager&) = delete;
 
-    // 아이템 생성 (전체 중 랜덤 / 타입 지정 랜덤)
+    // 아이템 생성 (전체 중 랜덤 / 타입 지정 랜덤 / 코드 지정)
     Item* CreateRandomItem();
     Item* CreateItemByType(ItemType type);
+    Item* CreateItemByCode(int code);
 
     // 인벤토리 UI 관리
     void OpenInventory(Player* player);

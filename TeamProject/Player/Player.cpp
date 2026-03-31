@@ -45,6 +45,14 @@ void Player::SetDex(int _dex) { dex = _dex; }
 //    cout << "------------------------------------" << endl;
 //}
 
+void Player::TickInvisibility()
+{
+    if (invisibilityTurns <= 0) return;
+    --invisibilityTurns;
+    if (invisibilityTurns == 0)
+        Render::GetInstance().AddLog("투명화가 해제됐습니다.", CLR_DARK_GRAY);
+}
+
 void Player::Heal(int amount)
 {
     hp += amount;
@@ -106,6 +114,14 @@ void Player::TakeDamage(int _damage, int attackerDex)
 
         hp -= damageAfterDef;
         Render::GetInstance().AddLog("당신은 " + std::to_string(damageAfterDef) + "의 데미지를 입었습니다!", CLR_RED);
+
+        if (hp <= 0 && hasReviveToken)
+        {
+            hasReviveToken = false;
+            hp = maxHp / 2;
+            Render::GetInstance().AddLog("부활 토큰 발동! 체력 " + std::to_string(hp) + "으로 부활!", CLR_YELLOW);
+            Render::GetInstance().ClearInfo2();
+        }
     }
     else
     {
@@ -140,6 +156,7 @@ bool Player::Attack(Monster* target)
         this->GainExp(monsterExp);
 
         Render::GetInstance().AddLog(target->GetName() + "을(를) 처치하여 " + std::to_string(monsterExp) + " EXP 획득!", CLR_YELLOW);
+        GetInventory().AddItem(ItemManager::GetInstance().CreateRandomItem());
     }
 
     return true;
@@ -216,9 +233,16 @@ void Player::OnCollision(Tile targetTile)
         render.AddLog("보스", CLR_DARK_GRAY);
         break;
     case Tile::Chest:
-        // 아이템 매니저
-        render.AddLog("보물상자", CLR_DARK_GRAY);
+    {
+        Item* item = ItemManager::GetInstance().CreateRandomItem();
+        if (item)
+        {
+            std::string itemName = item->GetName();
+            inventory.AddItem(item);
+            render.AddLog("보물상자에서 [" + itemName + "] 을(를) 획득했습니다!", CLR_YELLOW);
+        }
         break;
+    }
     case Tile::Stair:
         // 다음 층이동
         Render::GetInstance().AddLog("계단", CLR_DARK_GRAY);

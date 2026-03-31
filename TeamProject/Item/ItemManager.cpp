@@ -62,6 +62,24 @@ Item* ItemManager::CreateItemByType(ItemType type)
     }
 }
 
+Item* ItemManager::CreateItemByCode(int code)
+{
+    switch (code)
+    {
+    case 101: return new HealPotion();
+    case 102: return new TeleportPotion();
+    case 103: return new InvisibilityItem();
+    case 104: return new ShieldItem();
+    case 105: return new ReviveToken();
+    case 106: return new Bomb();
+    case 107: return new VampireItem();
+    case 108: return new StunItem();
+    case 109: return new DuplicateItem();
+    case 110: return new RageItem();
+    default:  return nullptr;
+    }
+}
+
 // 인벤토리 UI
 
 void ItemManager::OpenInventory(Player* player)
@@ -86,7 +104,11 @@ void ItemManager::CloseInventory(Player* player)
 
     Render& render = Render::GetInstance();
     render.RenderInfo(player);
-    render.ClearInfo2();
+
+    if (player->HasReviveToken())
+        render.ShowReviveToken();
+    else
+        render.ClearInfo2();
 }
 
 void ItemManager::HandleInventoryAction(GameAction action, Player* player, bool isBattleMode)
