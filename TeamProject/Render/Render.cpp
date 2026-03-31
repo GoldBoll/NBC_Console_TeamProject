@@ -148,6 +148,8 @@ void Render::RenderMap(const Map& map, const Player* player, const std::vector<M
                 SetColor(CLR_RED);         glyph = 'M'; break;
                 case Tile::EliteMonster:
                 SetColor(CLR_MAGENTA);     glyph = 'E'; break;
+                case Tile::Boss:
+                SetColor(CLR_BLUE);        glyph = 'B'; break;
                 default:
                 SetColor(CLR_DARK_GRAY);   glyph = ' '; break;
             }
@@ -174,8 +176,12 @@ void Render::RenderMap(const Map& map, const Player* player, const std::vector<M
                 char glyph;
                 int color;
 
-                
-                if(currentTile == Tile::Chest) 
+                if (currentTile == Tile::Boss)
+                {
+                    glyph = 'B';
+                    color = CLR_RED;
+                }
+                else if(currentTile == Tile::Chest) 
                 {
                     // 미믹일 경우
                     glyph = 'C';

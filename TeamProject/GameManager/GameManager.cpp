@@ -267,18 +267,31 @@ void GameManager::HandleAction(GameAction action)
 
 void GameManager::SceneChange(int stage)
 {
-    stage = 4;
     if (stage >= 4)
     {
         // 보스룸: 중앙 20x20 Floor, 나머지 Wall
-        map.GenerateBossRoom();
-
+        //map.GenerateBossRoom();
+        BspManager::Params bspParams;
+        bspParams.minPartitionW = 22; // 방(20) + 여백(1*2) = 최소 22
+        bspParams.minPartitionH = 22;
+        bspParams.minRoomW = 20;
+        bspParams.minRoomH = 20;
+        bspParams.maxRoomW = 20;
+        bspParams.maxRoomH = 20;
+        bspParams.maxDepth = 0; // 분할 없이 방 1개만 생성
+        BspManager::GetInstance().Generate(map, bspParams);
+        
+        const std::vector<Room>& rooms = BspManager::GetInstance().GetRooms();
+        SpawnManager::GetInstance()->SpawnPlayerInRooms(map, rooms, player);
+        SpawnManager::GetInstance()->SpawnObjectInRooms(map, rooms);
+        SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms, stage);
+        monsters = SpawnManager::GetInstance()->GetActiveMonsters();
         // 플레이어를 보스룸 중앙에 배치
-        const int bossRoomCenterX = MAP_W / 2;
+        /*const int bossRoomCenterX = MAP_W / 2;
         const int bossRoomCenterY = MAP_H / 2;
         player->SetX(bossRoomCenterX);
         player->SetY(bossRoomCenterY);
-        map.SetTile(bossRoomCenterX, bossRoomCenterY, Tile::Player);
+        map.SetTile(bossRoomCenterX, bossRoomCenterY, Tile::Player);*/
     }
     else
     {

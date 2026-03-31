@@ -360,16 +360,12 @@ void SpawnManager::Stage4(Map& _map, const std::vector<Room>& _rooms)
 
     for (const auto& room : _rooms)
     {
-        // 시작 방(Type::Start)에는 일반 몹 스폰 안함
-        if (room.type == RoomType::Boss)
-        {
-            int rx = room.CenterX();
-            int ry = room.CenterY() + -10;
+        int rx = room.CenterX();
+        int ry = room.CenterY() + -7;
 
-            Monster* boss = new Boss();
-            boss->SetPosition(rx, ry);
-            activeMonsters.push_back(boss);
-            _map.SetTile(rx, ry, boss->GetDisplayTile());
-        }
+        Monster* boss = new Boss();
+        boss->SetPosition(rx, ry);
+        activeMonsters.push_back(boss);
+        _map.SetTile(rx, ry, boss->GetDisplayTile());
     }
 }
