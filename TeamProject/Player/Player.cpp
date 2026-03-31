@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 #include "../GameManager/GameManager.h"
+#include "../SpawnManager/SpawnManager.h"
 
 Player::Player(std::string _jobName)
 {
@@ -189,7 +190,7 @@ bool Player::TileCheck(int _dx, int _dy, Map& _map)
     // 몬스터 타일일 경우: 이동하지 않고 충돌 처리 (겹침 방지)
     if (targetTile == Tile::Monster || targetTile == Tile::EliteMonster || targetTile == Tile::Boss)
     {
-        OnCollision(targetTile);
+        OnCollision(targetTile, nextX, nextY, _map);
         return true;
     }
 
@@ -201,7 +202,7 @@ bool Player::TileCheck(int _dx, int _dy, Map& _map)
         y = nextY;
         _map.SetTile(x, y, Tile::Player);
 
-        OnCollision(targetTile);
+        OnCollision(targetTile, nextX, nextY, _map);
         return true;
     }
 
@@ -215,7 +216,7 @@ bool Player::TileCheck(int _dx, int _dy, Map& _map)
     return false;
 }
 
-void Player::OnCollision(Tile targetTile)
+void Player::OnCollision(Tile targetTile, int targetX, int targetY, Map& _map)
 {
     Render& render = Render::GetInstance();
     switch (targetTile)
@@ -234,6 +235,18 @@ void Player::OnCollision(Tile targetTile)
         break;
     case Tile::Chest:
     {
+        // 아이템 매니저
+        render.AddLog("보물상자", CLR_DARK_GRAY);
+        Monster* m = SpawnManager::GetInstance()->GetMonsterAt(targetX, targetY);
+        if (m != nullptr)
+        {
+            m->Interact();
+            _map.SetTile(targetX, targetY, Tile::Monster);
+            return;
+        }
+
+        // 아이템 상자 획득 처리해야함
+        _map.SetTile(targetX, targetY, Tile::Floor);
         Item* item = ItemManager::GetInstance().CreateRandomItem();
         if (item)
         {

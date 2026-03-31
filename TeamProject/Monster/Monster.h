@@ -54,8 +54,11 @@ public:
     void SetState(MonsterState _state) { state = _state; }
 
     // Actions
+
+   
+    virtual void Move(int _x, int _y, Map& _map);
+
     void TakeDamage(int _damage, int attackerDex = 0);
-    void Move(int _x, int _y, Map& _map);
     void UpdateAI(Map& _map);
 
     void Update(int playerX, int playerY, Map& _map);
@@ -63,4 +66,7 @@ public:
 
     bool Attack(int playerX, int playerY);
     bool Attack(Player* player);
+
+    virtual void Interact() {};
+    virtual Tile GetDisplayTile() const { return Tile::Monster; }
 };
