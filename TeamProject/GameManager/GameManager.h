@@ -13,14 +13,17 @@ public:
     static GameManager& GetInstance();
 
     void Run();
+    void Init(int stage);
 
     GameManager(const GameManager&)            = delete;
     GameManager& operator=(const GameManager&) = delete;
 
+    int GetCurrentStageIndex() const { return curStage; }
+    void SetCurrentStageIndex(int stage) { curStage = stage; }
+
 private:
     GameManager();
 
-    void Init();
     void HandleAction(GameAction action);
     void UpdateMonster();
     void ProcessBattle();
@@ -28,6 +31,8 @@ private:
     void OpenInventory();
     void CloseInventory();
     void HandleInventoryAction(GameAction action);
+
+
 
     Map                  map;
     Player*              player;
@@ -42,4 +47,5 @@ private:
     bool                inventoryOpen    = false;
     int                 invSelectedIdx   = 0;
     int                 invScrollOffset  = 0;
+    int                 curStage         = 1;
 };
