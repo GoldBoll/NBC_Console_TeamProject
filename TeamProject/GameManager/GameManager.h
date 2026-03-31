@@ -27,6 +27,7 @@ private:
     void HandleAction(GameAction action);
     void UpdateMonster();
     void ProcessBattle();
+    void SceneChange(int stage);
 
     void OpenInventory();
     void CloseInventory();

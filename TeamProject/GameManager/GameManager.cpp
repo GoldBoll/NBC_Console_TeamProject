@@ -44,22 +44,7 @@ void GameManager::Init(int stage)
     player->GetInventory().AddItem(new InvisibilityItem());
     player->GetInventory().AddItem(new TeleportPotion());
 
-    // BSP 맵 생성
-    BspManager::Params bspParams;
-    BspManager::GetInstance().Generate(map, bspParams);
-
-    const std::vector<Room>& rooms = BspManager::GetInstance().GetRooms();
-
-    // 플레이어 스폰
-    SpawnManager::GetInstance()->SpawnPlayerInRooms(map, rooms, player);
-
-    // 오브젝트 스폰
-    SpawnManager::GetInstance()->SpawnObjectInRooms(map, rooms);
-
-    // 몬스터 스폰
-    SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms);
-    // 몬스터 목록 가져오기
-    monsters = SpawnManager::GetInstance()->GetActiveMonsters();
+    SceneChange(stage);
 
     render.DrawStaticUI();
     render.RenderHelp();
@@ -278,6 +263,43 @@ void GameManager::HandleAction(GameAction action)
         monsters = SpawnManager::GetInstance()->GetActiveMonsters();
 
         needsRedraw = true;
+    }
+}
+
+void GameManager::SceneChange(int stage)
+{
+    if (stage >= 4)
+    {
+        // 보스룸: 중앙 20x20 Floor, 나머지 Wall
+        map.GenerateBossRoom();
+
+        // 플레이어를 보스룸 중앙에 배치
+        const int bossRoomCenterX = MAP_W / 2;
+        const int bossRoomCenterY = MAP_H / 2;
+        player->SetX(bossRoomCenterX);
+        player->SetY(bossRoomCenterY);
+        map.SetTile(bossRoomCenterX, bossRoomCenterY, Tile::Player);
+
+        monsters.clear();
+    }
+    else
+    {
+        // BSP 맵 생성
+        BspManager::Params bspParams;
+        BspManager::GetInstance().Generate(map, bspParams);
+
+        const std::vector<Room>& rooms = BspManager::GetInstance().GetRooms();
+
+        // 플레이어 스폰
+        SpawnManager::GetInstance()->SpawnPlayerInRooms(map, rooms, player);
+
+        // 오브젝트 스폰
+        SpawnManager::GetInstance()->SpawnObjectInRooms(map, rooms);
+
+        // 몬스터 스폰
+        SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms);
+        // 몬스터 목록 가져오기
+        monsters = SpawnManager::GetInstance()->GetActiveMonsters();
     }
 }
 
