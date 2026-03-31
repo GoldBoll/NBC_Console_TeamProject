@@ -252,7 +252,8 @@ void Player::OnCollision(Tile targetTile, int targetX, int targetY, Map& _map)
             {
                 std::string itemName = item->GetName();
                 inventory.AddItem(item);
-                render.AddLog("보물상자에서 [" + itemName + "] 을(를) 획득했습니다!", CLR_YELLOW);
+                render.AddLog("보물상자에서 [" + itemName + "] 을(를)", CLR_YELLOW);
+                render.AddLog(" 획득했습니다!", CLR_YELLOW);
             }
         }
         break;

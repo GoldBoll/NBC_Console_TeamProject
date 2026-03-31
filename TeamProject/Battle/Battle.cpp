@@ -25,8 +25,9 @@ void Battle::CheckCombat(Player* player, std::vector<Monster*>& monsters)
         // 투명 상태면 몬스터가 탐지 불가 → 전부 IDLE로 복귀
         if (player->IsInvisible())
         {
-            newState = MonsterState::IDLE;
+            monster->SetState(MonsterState::IDLE);
         }
+
         // 거리가 1 이내면 전투(COMBAT), 그 외 4칸 이내면 추격(CHASE)
         if (dist <= 1)      newState = MonsterState::COMBAT;
         else if (dist <= 4) newState = MonsterState::CHASE;

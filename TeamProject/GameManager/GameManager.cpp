@@ -39,8 +39,12 @@ void GameManager::Init(int stage)
 
     SceneChange(stage);
 
-    // 예시: 랜덤 아이템 지급
-    //player->GetInventory().AddItem(itemMgr.CreateItemByCode(105));
+    //기본 아이템 지급
+    for (size_t i = 0; i < 3; i++)
+    {
+        player->GetInventory().AddItem(itemMgr.CreateItemByCode(101));
+        //player->GetInventory().AddItem(itemMgr.CreateRandomItem());
+    }
 
     render.DrawStaticUI();
     render.RenderHelp();
