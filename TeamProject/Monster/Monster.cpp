@@ -11,13 +11,30 @@ Monster::Monster(std::string _name, int _hp, int _atk, int _def, int _dex, int _
     }
 }
 
-void Monster::TakeDamage(int _damage)
+void Monster::TakeDamage(int _damage, int attackerDex)
 {
-    // 방어력 계산 적용
-    // 최종 데미지 = (공격력 × 무기배율) × (1.0 - (방어력 × 0.03))
-    int damageAfterDef = static_cast<int>(_damage * (1.0 - (def * 0.03)));
+    // 명중률 계산: 무기 명중률 + (공격자 DEX - 방어자 DEX) × 2
+    // 기본 무기 명중률은 90으로 가정 (플레이어와 동일하게 설정)
+    int attackerWeaponHit = 90;
+    int finalHitRate = attackerWeaponHit + (attackerDex - dex) * 2;
+    if (finalHitRate < 5) finalHitRate = 5;
+    else if (finalHitRate > 95) finalHitRate = 95;
 
-    hp -= damageAfterDef;
+    int roll = std::rand() % 100;
+
+    if (roll < finalHitRate)
+    {
+        // 방어력 계산 적용
+        // 최종 데미지 = 공격력 × (1.0 - (방어력 × 0.03))
+        int damageAfterDef = static_cast<int>(_damage * (1.0 - (def * 0.03)));
+
+        hp -= damageAfterDef;
+        Render::GetInstance().AddLog(name + "에게 " + std::to_string(damageAfterDef) + "의 데미지!", CLR_WHITE);
+    }
+    else
+    {
+        Render::GetInstance().AddLog(name + "에게 공격이 빗나갔습니다!", CLR_DARK_GRAY);
+    }
 }
 
 void Monster::Move(int _dx, int _dy, Map& _map)
@@ -127,27 +144,8 @@ bool Monster::Attack(Player* player)
 {
     if (!player) return false;
 
-    int monsterDex = this->dex;
-    int playerDex = player->GetDex();
-
-    // 명중률 계산: 무기 명중률 + (공격자 DEX - 방어자 DEX) × 2
-    int finalHitRate = equippedWeaponHit + (monsterDex - playerDex) * 2;
-
-    if (finalHitRate < 5) finalHitRate = 5;
-    else if (finalHitRate > 95) finalHitRate = 95;
-
-    int roll = std::rand() % 100;
-
-    if (roll < finalHitRate)
-    {
-        int damage = this->atk;
-        player->TakeDamage(damage, this->dex);
-        Render::GetInstance().AddLog(this->GetName() + "의 공격이 명중했습니다!", CLR_RED);
-        return true;
-    }
-    else
-    {
-        Render::GetInstance().AddLog(this->GetName() + "의 공격이 빗나갔습니다!", CLR_DARK_GRAY);
-        return false;
-    }
+    // 공격 시도 시, 수치 계산 없이 전달만 함 (TakeDamage에서 통합 처리)
+    player->TakeDamage(this->atk, this->dex);
+    Render::GetInstance().AddLog(this->GetName() + "의 공격!", CLR_RED);
+    return true;
 }
