@@ -122,43 +122,18 @@ bool Player::Attack(Monster* target)
 {
     if (!target) return false;
 
-    int playerDex = this->dex;
-    int monsterDex = target->GetDex();
+    // 공격 시도 시, 수치 계산 없이 전달만 함 (TakeDamage에서 통합 처리)
+    target->TakeDamage(this->atk, this->dex);
 
-    // 명중률 계산: 무기 명중률 + (공격자 DEX - 방어자 DEX) × 2
-    int finalHitRate = equippedWeaponHit + (playerDex - monsterDex) * 2;
-
-    if (finalHitRate < 5) finalHitRate = 5;
-    else if (finalHitRate > 95) finalHitRate = 95;
-
-    int roll = std::rand() % 100;
-
-    if (roll < finalHitRate)
+    if (target->IsDead())
     {
-        // 몬스터의 방어력 계산
-        // 최종 데미지 = (공격력 × 무기배율) × (1.0 - (방어력 × 0.03))
-        int monsterDef = target->GetDef();
-        int damage = static_cast<int>(this->atk * (1.0 - (monsterDef * 0.03)));
+        int monsterExp = target->GetExp();
+        this->GainExp(monsterExp);
 
-        target->TakeDamage(damage);
-
-        Render::GetInstance().AddLog(target->GetName() + "에게 " + std::to_string(damage) + "의 데미지!", CLR_WHITE);
-
-        if (target->IsDead())
-        {
-            int monsterExp = target->GetExp();
-            this->GainExp(monsterExp);
-
-            Render::GetInstance().AddLog(target->GetName() + "을(를) 처치하여 " + std::to_string(monsterExp) + " EXP 획득!", CLR_YELLOW);
-        }
-
-        return true;
+        Render::GetInstance().AddLog(target->GetName() + "을(를) 처치하여 " + std::to_string(monsterExp) + " EXP 획득!", CLR_YELLOW);
     }
-    else
-    {
-        Render::GetInstance().AddLog(target->GetName() + "에게 공격이 빗나갔습니다!", CLR_DARK_GRAY);
-        return false;
-    }
+
+    return true;
 }
 
 bool Player::Move(GameAction _action, Map& _map)
