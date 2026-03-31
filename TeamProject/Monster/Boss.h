@@ -1,9 +1,10 @@
 ﻿#pragma once
 #include "Monster.h"
 
-class Goblin : public Monster
+class Boss : public Monster
 {
 public:
-    Goblin(bool _elite);
+    Boss();
     Tile GetDisplayTile() const override;
 };
+

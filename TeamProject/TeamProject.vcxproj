@@ -125,6 +125,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Battle\Battle.cpp" />
+    <ClCompile Include="Monster\Boss.cpp" />
     <ClCompile Include="BspManager\BspManager.cpp" />
     <ClCompile Include="GameManager\GameManager.cpp" />
     <ClCompile Include="Item\Inventory.cpp" />
@@ -221,6 +222,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Battle\Battle.h" />
+    <ClInclude Include="Monster\Boss.h" />
     <ClInclude Include="BspManager\BspManager.h" />
     <ClInclude Include="GameManager\GameManager.h" />
     <ClInclude Include="Item\Inventory.h" />
