@@ -138,6 +138,18 @@ void GameManager::Run()
             render.RenderMap(map, player, monsters);
             if (!inventoryOpen)
                 render.RenderInfo(player);
+
+            // 전투 중이면 몬스터 정보 출력
+            if (isBattleMode && battleTarget != nullptr)
+            {
+                render.RenderMonsterInfo(battleTarget);
+            }
+            else if (!inventoryOpen)
+            {
+                // 인벤토리도 아니고 전투도 아니면 Info2 비움
+                render.ClearInfo2();
+            }
+
             render.RenderLog();
             needsRedraw = false;
         }
@@ -241,7 +253,7 @@ void GameManager::HandleAction(GameAction action)
             if (player->CanDash())
             {
                 isNextMoveDash = true;
-                render.AddLog("대쉬 기운이 감돕니다!", CLR_YELLOW);
+                render.AddLog("대쉬 발동!", CLR_YELLOW);
             }
             else render.AddLog("게이지가 부족합니다.", CLR_DARK_GRAY);
             break;

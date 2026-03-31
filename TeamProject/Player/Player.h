@@ -43,7 +43,7 @@ protected:
     Inventory            inventory;
     // vector<StatusEffect> statusEffects;
 
-    int dashGauge = 0;
+    int dashGauge = 120;
     const int maxDashGauge = 120;
     int equippedWeaponHit = 90;
 

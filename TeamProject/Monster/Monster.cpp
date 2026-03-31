@@ -3,7 +3,7 @@
 #include <cstdlib>
 
 Monster::Monster(std::string _name, int _hp, int _atk, int _def, int _dex, int _exp, bool _elite)
-    :name(_name), hp(_hp), atk(_atk), def(_def), dex(_dex), exp(_exp), x(0), y(0), isElite(_elite)
+    :name(_name), hp(_hp), maxHp(_hp), atk(_atk), def(_def), dex(_dex), exp(_exp), x(0), y(0), isElite(_elite)
 {
     if (isElite)
     {
@@ -14,7 +14,6 @@ Monster::Monster(std::string _name, int _hp, int _atk, int _def, int _dex, int _
 void Monster::TakeDamage(int _damage, int attackerDex)
 {
     // 명중률 계산: 무기 명중률 + (공격자 DEX - 방어자 DEX) × 2
-    // 기본 무기 명중률은 90으로 가정 (플레이어와 동일하게 설정)
     int attackerWeaponHit = 90;
     int finalHitRate = attackerWeaponHit + (attackerDex - dex) * 2;
     if (finalHitRate < 5) finalHitRate = 5;
@@ -122,22 +121,39 @@ void Monster::Update(int playerX, int playerY, Map& _map)
 
 void Monster::MoveTowards(int targetX, int targetY, Map& _map)
 {
-    int dx = 0;
-    int dy = 0;
+    // 이동 가능한 4방향 (상, 하, 좌, 우)
+    struct Dir { int dx, dy; int dist; };
+    Dir dirs[4] = { {0, -1, 0}, {0, 1, 0}, {-1, 0, 0}, {1, 0, 0} };
 
-    int dist_x = targetX - x;
-    int dist_y = targetY - y;
-
-    if (abs(dist_x) > abs(dist_y))
-    {
-        dx = (dist_x > 0) ? 1 : -1;
-    }
-    else if (dist_y != 0)
-    {
-        dy = (dist_y > 0) ? 1 : -1;
+    // 각 방향으로 이동했을 때의 플레이어와의 거리 계산
+    for (int i = 0; i < 4; ++i) {
+        int nx = x + dirs[i].dx;
+        int ny = y + dirs[i].dy;
+        // 맨해튼 거리 사용 (가로나 세로 합)
+        dirs[i].dist = std::abs(targetX - nx) + std::abs(targetY - ny);
     }
 
-    Move(dx, dy, _map);
+    // 거리 순으로 정렬 (가장 가까워지는 방향이 0번 인덱스로 오도록)
+    for (int i = 0; i < 3; ++i) {
+        for (int j = i + 1; j < 4; ++j) {
+            if (dirs[i].dist > dirs[j].dist) {
+                Dir temp = dirs[i];
+                dirs[i] = dirs[j];
+                dirs[j] = temp;
+            }
+        }
+    }
+
+    // 플레이어와 가장 가까워지는 방향부터 시도하여 갈 수 있는 곳(Floor)으로 이동
+    for (int i = 0; i < 4; ++i) {
+        int nx = x + dirs[i].dx;
+        int ny = y + dirs[i].dy;
+
+        if (_map.InBounds(nx, ny) && _map.GetTile(nx, ny) == Tile::Floor) {
+            this->Move(dirs[i].dx, dirs[i].dy, _map);
+            return; // 이동 성공 시 종료
+        }
+    }
 }
 
 bool Monster::Attack(Player* player)
@@ -145,7 +161,7 @@ bool Monster::Attack(Player* player)
     if (!player) return false;
 
     // 공격 시도 시, 수치 계산 없이 전달만 함 (TakeDamage에서 통합 처리)
-    player->TakeDamage(this->atk, this->dex);
     Render::GetInstance().AddLog(this->GetName() + "의 공격!", CLR_RED);
+    player->TakeDamage(this->atk, this->dex);
     return true;
 }
