@@ -64,7 +64,7 @@ void GameManager::Init(int stage)
     render.DrawStaticUI();
     render.RenderHelp();
 
-    if (stage < 1)
+    if (stage <= 1)
     {
         render.AddLog("게임이 시작되었습니다!", CLR_YELLOW);
         render.AddLog("WASD: 이동  |  `: 대쉬 활성화", CLR_GRAY);
@@ -202,6 +202,16 @@ void GameManager::HandleAction(GameAction action)
         return;
     }
 
+    // 인벤토리가 열려있으면 인벤토리 입력 처리
+    if (inventoryOpen)
+    {
+        if (action == GameAction::Inventory)
+            CloseInventory();
+        else
+            HandleInventoryAction(action);
+        return;
+    }
+
     // 탐색 중 이동
     if (action == GameAction::MoveUp || action == GameAction::MoveDown ||
         action == GameAction::MoveLeft || action == GameAction::MoveRight)
@@ -223,6 +233,10 @@ void GameManager::HandleAction(GameAction action)
     {
         switch (action)
         {
+        case GameAction::Inventory:
+            OpenInventory();
+            return;
+
         case GameAction::Dash:
             if (player->CanDash())
             {
