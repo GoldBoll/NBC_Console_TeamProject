@@ -87,9 +87,12 @@ void Player::LevelUp()
         atk += atkBonus;
         break;
         case 3:
-        dex += dexBonus;
+        def += defBonus;
         break;
         case 4:
+        dex += dexBonus;
+        break;
+        case 5:
         hp += hpBonus;
         if (hp >= maxHp) hp = maxHp;
         break;
