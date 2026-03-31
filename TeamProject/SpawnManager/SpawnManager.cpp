@@ -35,23 +35,27 @@ void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _roo
         // 엘리트 혹은 보물방일 때 (엘리트 몹 1마리)
         if (room.type == RoomType::Elite || room.type == RoomType::Treasure)
         {
-            int rx = room.x + 1 + (rand() % (max(1, room.w - 2)));
-            int ry = room.y + 1 + (rand() % (max(1, room.h - 2)));
-
-            // 플레이어와 겹치지 않을 때까지 좌표 재선정 (최대 10번 시도)
-            /*for(int attempt=0; attempt<10; ++attempt)
+            for (int spawncount = 0; spawncount < 1;)
             {
-                if (rx != playerX || ry != playerY) break;
-                rx = room.x + 1 + (rand() % (max(1, room.w - 2)));
-                ry = room.y + 1 + (rand() % (max(1, room.h - 2)));
-            }*/
+                int rx = room.x + 1 + (rand() % (max(1, room.w - 2)));
+                int ry = room.y + 1 + (rand() % (max(1, room.h - 2)));
+                if (_map.GetTile(rx, ry) == Tile::Floor)
+                {
+                    Monster* m = nullptr;
 
-            if (_map.GetTile(rx, ry) == Tile::Floor)
-            {
-                Monster* m = new Goblin(true);
-                m->SetPosition(rx, ry);
-                activeMonsters.push_back(m);
-                _map.SetTile(rx, ry, Tile::EliteMonster);
+                    if (rand() % 2 == 0)
+                    {
+                        m = new Goblin(true);
+                    }
+                    else
+                    {
+                        m = new Orc(true);
+                    }
+                    m->SetPosition(rx, ry);
+                    activeMonsters.push_back(m);
+                    _map.SetTile(rx, ry, Tile::EliteMonster);
+                    spawncount++;
+                }
             }
         }
         // 일반 방일 때

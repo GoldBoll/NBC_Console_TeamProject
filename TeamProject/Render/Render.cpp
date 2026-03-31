@@ -405,6 +405,8 @@ void Render::RenderInventory(const Inventory& inv, int selectedIdx, int scrollOf
         else          { SetColor(CLR_DARK_GRAY); std::cout << ' '; SetColor(CLR_GRAY);   }
 
         std::string name = items[listIdx].second->GetName();
+        int cnt = items[listIdx].second->count;
+        if (cnt > 1) name += " (" + std::to_string(cnt) + ")";
         int maxLen = MID_BOX_W - 4;
         if ((int)name.size() > maxLen) name = name.substr(0, maxLen);
         std::cout << name;
