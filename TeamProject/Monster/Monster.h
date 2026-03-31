@@ -58,7 +58,7 @@ public:
     void Move(int _x, int _y, Map& _map);
     void UpdateAI(Map& _map);
 
-    virtual void Update(int playerX, int playerY, Map& _map);
+    void Update(int playerX, int playerY, Map& _map);
     void MoveTowards(int targetX, int targetY, Map& _map);
 
     bool Attack(int playerX, int playerY);

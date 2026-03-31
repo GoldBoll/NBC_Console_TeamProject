@@ -26,9 +26,9 @@ void Monster::Move(int _dx, int _dy, Map& _map)
     int nextY = y + _dy;
 
     // 현재 위치와 다음 위치가 모두 유효해야 동작
-    if (_map.InBounds(x, y) && _map.InBounds(nextX, nextY) && _map.GetTile(nextX, nextY) == Tile::Floor)
+    if (_map.InBounds(nextX, nextY) && _map.GetTile(nextX, nextY) == Tile::Floor)
     {
-        Tile currentTile = _map.GetTile(x, y);
+        //Tile currentTile = _map.GetTile(x, y);
 
         // 이전 위치 타일 정리
         _map.SetTile(x, y, Tile::Floor);
@@ -47,7 +47,8 @@ void Monster::Move(int _dx, int _dy, Map& _map)
 void Monster::UpdateAI(Map& _map)
 {
     // 추적 상태거나 전투중일 때는 랜덤 이동을 하지 않는다.
-    if (state == MonsterState::CHASE || state == MonsterState::COMBAT) return;
+    //if (state == MonsterState::CHASE || state == MonsterState::COMBAT) return;
+    if (state != MonsterState::IDLE) return;
 
     // 너무 자주 움직이지 않게 확률 부여 (30% 확률로 이동)
     if (rand() % 100 > 30) return;

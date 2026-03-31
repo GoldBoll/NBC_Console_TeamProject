@@ -183,12 +183,14 @@ void Player::Move(GameAction _action, Map& _map)
     }
 }
 
-bool Player::TileCheck(int _x, int _y, Map& _map)
+bool Player::TileCheck(int _dx, int _dy, Map& _map)
 {
-    int nextX = x + _x;
-    int nextY = y + _y;
+    int nextX = x + _dx;
+    int nextY = y + _dy;
 
-    if (_map.GetTile(nextX, nextY) == Tile::Floor)
+    Tile targetTile = _map.GetTile(nextX, nextY);
+
+    if (targetTile == Tile::Floor)
     {
         _map.SetTile(x, y, Tile::Floor);
 
@@ -199,7 +201,12 @@ bool Player::TileCheck(int _x, int _y, Map& _map)
         return true;
     }
 
-    else return false;
+    if (targetTile != Tile::Wall)
+    {
+        OnCollision(targetTile);
+    }
+
+    return false;
 }
 
 void Player::OnCollision(Tile targetTile)
@@ -208,18 +215,23 @@ void Player::OnCollision(Tile targetTile)
     {
     case Tile::Monster:
         // 배틀 매니저
+        Render::GetInstance().AddLog("몬스터", CLR_DARK_GRAY);
         break;
     case Tile::EliteMonster:
         // 배틀 매니저
+        Render::GetInstance().AddLog("엘리트 몬스터", CLR_DARK_GRAY);
         break;
     case Tile::Boss:
         // 배틀 매니저
+        Render::GetInstance().AddLog("보스", CLR_DARK_GRAY);
         break;
     case Tile::Chest:
         // 아이템 매니저
+        Render::GetInstance().AddLog("보물상자", CLR_DARK_GRAY);
         break;
     case Tile::Stair:
         // 다음 층이동
+        Render::GetInstance().AddLog("계단", CLR_DARK_GRAY);
         break;
     }
 }

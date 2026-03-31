@@ -56,7 +56,7 @@ void GameManager::Init()
     SpawnManager::GetInstance()->SpawnObjectInRooms(map, rooms);
 
     // 몬스터 스폰
-    SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms, player->GetX(), player->GetY());
+    SpawnManager::GetInstance()->SpawnMonstersInRooms(map, rooms);
     // 몬스터 목록 가져오기
     monsters = SpawnManager::GetInstance()->GetActiveMonsters();
 
@@ -72,9 +72,9 @@ void GameManager::Init()
     inputbutton    = false;
     isNextMoveDash = false;
 
-    render.RenderMap(map, player, monsters);
+    /*render.RenderMap(map, player, monsters);
     render.RenderInfo(player);
-    render.RenderLog();
+    render.RenderLog();*/
     /*for (int y = 0; y < MAP_H; ++y)
     {
         for (int x = 0; x < MAP_W; ++x)
@@ -149,7 +149,7 @@ void GameManager::HandleAction(GameAction action)
 {
     Render& render = Render::GetInstance();
     bool moved = false;
-
+    inputbutton = true;
     // 전투 중 명령
     if (isBattleMode && battleTarget != nullptr)
     {
@@ -206,10 +206,10 @@ void GameManager::HandleAction(GameAction action)
         else render.AddLog("게이지가 부족합니다.", CLR_DARK_GRAY);
         break;
 
-        case GameAction::MoveUp:    dy = -1; break;
-        case GameAction::MoveDown:  dy = 1;  break;
-        case GameAction::MoveLeft:  dx = -1; break;
-        case GameAction::MoveRight: dx = 1;  break;
+        case GameAction::MoveUp:    player->Move(action, map); break;
+        case GameAction::MoveDown:  player->Move(action, map);  break;
+        case GameAction::MoveLeft:  player->Move(action, map); break;
+        case GameAction::MoveRight: player->Move(action, map);  break;
         case GameAction::Help: render.AddLog("WASD: 이동 | `: 대쉬 | 1: 공격 | 2: 도망", CLR_CYAN); break;
         case GameAction::Quit: running = false; break;
         default: break;
@@ -281,7 +281,7 @@ void GameManager::HandleAction(GameAction action)
 
 void GameManager::UpdateMonster()
 {
-    if (isBattleMode) return;
+    //if (isBattleMode) return;
     for (Monster* m : monsters)
     {
         if (m && !m->IsDead()) m->UpdateAI(map);

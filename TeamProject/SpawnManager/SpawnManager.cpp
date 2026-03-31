@@ -23,7 +23,7 @@ const std::vector<Monster*>& SpawnManager::GetActiveMonsters() const
     return activeMonsters;
 }
 
-void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _rooms, int playerX, int playerY)
+void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _rooms)
 {
     activeMonsters.clear();
 
@@ -39,12 +39,12 @@ void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _roo
             int ry = room.y + 1 + (rand() % (max(1, room.h - 2)));
 
             // 플레이어와 겹치지 않을 때까지 좌표 재선정 (최대 10번 시도)
-            for(int attempt=0; attempt<10; ++attempt)
+            /*for(int attempt=0; attempt<10; ++attempt)
             {
                 if (rx != playerX || ry != playerY) break;
                 rx = room.x + 1 + (rand() % (max(1, room.w - 2)));
                 ry = room.y + 1 + (rand() % (max(1, room.h - 2)));
-            }
+            }*/
 
             if (_map.GetTile(rx, ry) == Tile::Floor)
             {
@@ -63,9 +63,19 @@ void SpawnManager::SpawnMonstersInRooms(Map& _map, const std::vector<Room>& _roo
                 int rx = room.x + 1 + (rand() % (max(1, room.w - 2)));
                 int ry = room.y + 1 + (rand() % (max(1, room.h - 2)));
 
-                if (_map.GetTile(rx, ry) == Tile::Floor && (rx != playerX || ry != playerY))
+                if (_map.GetTile(rx, ry) == Tile::Floor)
                 {
-                    Monster* m = (rand() % 2 == 0) ? (Monster*)new Goblin(false) : (Monster*)new Orc(false);
+                    Monster* m = nullptr;
+
+                    if (rand() % 2 == 0)
+                    {
+                        m = new Goblin(false);
+                    }
+                    else
+                    {
+                        m = new Orc(false);
+                    }
+
                     m->SetPosition(rx, ry);
                     activeMonsters.push_back(m);
                     _map.SetTile(rx, ry, Tile::Monster);
