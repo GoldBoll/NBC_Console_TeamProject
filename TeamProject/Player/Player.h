@@ -1,43 +1,117 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <vector>
-using namespace std;
+#include <iostream>
+#include "../GameManager/InputManager.h"
+#include "../Item/Inventory.h"
+#include "../Map/Map.h"
 
 struct Map;
-struct Monster;
 
-// ── 플레이어 ──────────────────────────────────────────
-struct Player
+class Monster;
+enum class Tile;
+
+class Player
 {
+protected:
     // 위치
     int x = 0, y = 0;
 
-    // 기본 정보
-    string name;
+    int combatRange = 2;
+    int chaseRange = 4;
 
-    // 전투 스탯
-    // text-rpg: defaultHealth = baseHp + constitution*10
-    int hp        = 200;
-    int maxHp     = 200;
-    int atk       = 30;
-    int def       = 0;
+    // status
+    std::string jobName;
+    int hp;
+    int maxHp;
+    int atk;
+    int def;
+    int dex;
 
-    // 성장 (text-rpg experience 시스템 참고)
-    int level     = 1;
-    int exp       = 0;
-    int expToNext = 100;
-    int gold      = 0;
+    int level;
+    int exp;
+    int expToNext;
+    //int gold      = 0;
 
-    // 인벤토리 & 상태이상
-    // Inventory            inventory;
+    // Level up bonus
+    int maxHpBonus;
+    int atkBonus;
+    int defBonus;
+    int dexBonus;
+    int hpBonus;
+    int bonusPoint;
+
+    Inventory            inventory;
     // vector<StatusEffect> statusEffects;
 
-    // ── 행동 ────────────────────────────────────────
-    void tryMove(int dx, int dy, Map& map, vector<Monster>& monsters);
-    void gainExp(int amount);
-    void levelUp();
-    void tickStatus();
+    int dashGauge = 120;
+    const int maxDashGauge = 120;
+    int equippedWeaponHit = 90;
+    int invisibilityTurns = 0;
+    bool hasReviveToken = false;
 
-    bool isAlive() const { return hp > 0; }
-    void printStatus() const;
+public:
+    Player(std::string _jobName);
+    ~Player();
+
+    // 나중에 2칸씩 움직이는 캐릭터도 있을 수 있으니 일단 가상함수로 구현
+    virtual void TryMove(int _dx, int _dy, Map& _map) = 0;
+
+    //virtual void attack() = 0;
+    //virtual void attack(Monster* monster) = 0;
+
+    // Getter
+    Inventory&       GetInventory()       { return inventory; }
+    const Inventory& GetInventory() const { return inventory; }
+
+    std::string GetJobName() const { return jobName; }
+    int GetLevel()     const { return level; }
+    int GetHP()        const { return hp; }
+    int GetMaxHP()     const { return maxHp; }
+    int GetExp()       const { return exp; }
+    int GetExpToNext() const { return expToNext; }
+    int GetAtk()       const { return atk; }
+    int GetDef()       const { return def; }
+    int GetDex()       const { return dex; }
+    int GetX()         const { return x; }
+    int GetY()         const { return y; }
+
+    // Setter
+    void SetLevel(int _level);
+    void SetHp(int _hp);
+    void SetAtk(int _atk);
+    void SetDef(int _def);
+    void SetDex(int _dex);
+    void SetX(int _x) { x = _x; }
+    void SetY(int _y) { y = _y; }
+
+    // player info
+    bool IsAlive()     const { return hp > 0; }
+    bool IsInvisible() const { return invisibilityTurns > 0; }
+    int  GetInvisibilityTurns() const { return invisibilityTurns; }
+
+    void SetInvisibility(int turns) { invisibilityTurns = turns; }
+    void TickInvisibility();
+
+    bool HasReviveToken()      const { return hasReviveToken; }
+    void ActivateReviveToken()       { hasReviveToken = true; }
+    void ConsumeReviveToken()        { hasReviveToken = false; }
+    //void PrintStatus() const;
+
+    void Heal(int amount);
+    void GainExp(int _exp);
+    void LevelUp();
+    void TakeDamage(int _damage, int attackerDex = 0);
+
+    void UpdateDash();
+    bool CanDash() const { return dashGauge >= maxDashGauge; }
+    void UseDash() { dashGauge = 0; }
+
+    int GetDashGauge() const { return dashGauge; }
+
+    bool Attack(Monster* target);
+    void DetectMonsters(std::vector<Monster*>& _monsters);
+    bool Move(GameAction action, Map& _map);
+    bool TileCheck(int _dx, int _dy, Map& _map);
+    void OnCollision(Tile targetTile, int _dx, int _dy, Map& _map);
 };
