@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <cstdlib>
 
+#include "../GameManager/GameManager.h"
+
 Player::Player(std::string _jobName)
 {
     jobName = _jobName;
@@ -212,9 +214,9 @@ void Player::OnCollision(Tile targetTile)
         break;
     case Tile::Stair:
         // 다음 층이동
-        render.AddLog("계단", CLR_DARK_GRAY);
-        break;
-    default:
+        Render::GetInstance().AddLog("계단", CLR_DARK_GRAY);
+        GameManager::GetInstance().SetCurrentStageIndex(GameManager::GetInstance().GetCurrentStageIndex() + 1);
+        GameManager::GetInstance().Init( GameManager::GetInstance().GetCurrentStageIndex() );
         break;
     }
 }

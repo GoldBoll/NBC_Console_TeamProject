@@ -31,7 +31,7 @@ GameManager::GameManager()
     player = new Warrior();
 }
 
-void GameManager::Init()
+void GameManager::Init(int stage)
 {
     srand((unsigned int)time(NULL));
 
@@ -39,6 +39,7 @@ void GameManager::Init()
     render.Init("TextRPG - NBC Team Project 2");
 
     //아이템 출력확인
+    player->GetInventory().AddItem(new HealPotion());
     player->GetInventory().AddItem(new HealPotion());
     player->GetInventory().AddItem(new InvisibilityItem());
     player->GetInventory().AddItem(new TeleportPotion());
@@ -63,8 +64,17 @@ void GameManager::Init()
     render.DrawStaticUI();
     render.RenderHelp();
 
-    render.AddLog("게임이 시작되었습니다!", CLR_YELLOW);
-    render.AddLog("WASD: 이동  |  대쉬: [~] 키", CLR_GRAY);
+    if (stage < 1)
+    {
+        render.AddLog("게임이 시작되었습니다!", CLR_YELLOW);
+        render.AddLog("WASD: 이동  |  `: 대쉬 활성화", CLR_GRAY);
+    }
+
+    render.AddLog(std::to_string(stage) + "층 입니다.", CLR_YELLOW);
+
+    if (stage == 4)
+        render.AddLog("보스룸 입니다.", CLR_YELLOW);
+
 
     running        = true;
     needsRedraw    = true;
@@ -92,7 +102,7 @@ void GameManager::Init()
 
 void GameManager::Run()
 {
-    Init();
+    Init(1);
 
     Render&       render = Render::GetInstance();
     InputManager& input  = InputManager::GetInstance();
@@ -126,7 +136,8 @@ void GameManager::Run()
         if (needsRedraw)
         {
             render.RenderMap(map, player, monsters);
-            render.RenderInfo(player);
+            if (!inventoryOpen)
+                render.RenderInfo(player);
             render.RenderLog();
             needsRedraw = false;
         }
@@ -149,7 +160,7 @@ void GameManager::HandleAction(GameAction action)
 {
     Render& render = Render::GetInstance();
     bool moved = false;
-    inputbutton = true;
+    //inputbutton = true;
     // 전투 중 명령
     if (isBattleMode && battleTarget != nullptr)
     {
