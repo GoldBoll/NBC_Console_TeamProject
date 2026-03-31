@@ -45,6 +45,13 @@ void Player::SetDex(int _dex) { dex = _dex; }
 //    cout << "------------------------------------" << endl;
 //}
 
+void Player::Heal(int amount)
+{
+    hp += amount;
+    if (hp > maxHp) hp = maxHp;
+    Render::GetInstance().AddLog("체력이 " + std::to_string(amount) + " 회복됐습니다! (" + std::to_string(hp) + "/" + std::to_string(maxHp) + ")", CLR_GREEN);
+}
+
 void Player::GainExp(int _exp)
 {
     exp += _exp;

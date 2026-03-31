@@ -86,6 +86,7 @@ public:
     bool IsAlive() const { return hp > 0; }
     //void PrintStatus() const;
 
+    void Heal(int amount);
     void GainExp(int _exp);
     void LevelUp();
     void TakeDamage(int _damage, int attackerDex = 0);

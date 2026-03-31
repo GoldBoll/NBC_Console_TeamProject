@@ -443,7 +443,6 @@ void Render::RenderItemDesc(const Item* item)
     GotoXY(INFO2_BOX_X + 1, y++);
     switch (item->type)
     {
-    case ItemType::WEAPON: std::cout << "[WEAPON]"; break;
     case ItemType::POTION: std::cout << "[POTION]"; break;
     default:               std::cout << "[ETC]";    break;
     }
