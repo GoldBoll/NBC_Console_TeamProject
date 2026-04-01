@@ -7,6 +7,8 @@
 #include "../GameManager/GameManager.h"
 #include "../SpawnManager/SpawnManager.h"
 #include <conio.h>
+#include <cmath>
+
 
 Player::Player(std::string _jobName)
 {
@@ -130,7 +132,7 @@ void Player::LevelUp()
         else { isMax = true; statName = "Dexterity"; }
         break;
     case 5:
-        int healAmount = static_cast<int>(maxHp * 0.55f);
+        int healAmount = static_cast<int>(std::round(maxHp * 0.55f));
         hp += healAmount;
         if (hp >= maxHp) hp = maxHp;
         statName = "Heal(55%)";
@@ -156,7 +158,7 @@ void Player::TakeDamage(int _damage, int attackerDex)
     {
         // 명중 시 방어력 계산 적용
         // 최종 데미지 = (공격력 × 무기배율) × (1.0 - (방어력 × 0.03))
-        int damageAfterDef = static_cast<int>(_damage * (1.0 - (def * 0.03)));
+        int damageAfterDef = static_cast<int>(std::round(_damage * (1.0 - (def * 0.03))));
 
         hp -= damageAfterDef;
         Render::GetInstance().AddLog(std::to_string(damageAfterDef) + "의 데미지를 입었습니다!", CLR_RED);

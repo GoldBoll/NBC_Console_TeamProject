@@ -1,6 +1,8 @@
 ﻿#include "Monster.h"
 #include "../Render/Render.h"
 #include <cstdlib>
+#include <cmath>
+
 
 Monster::Monster(std::string _name, int _hp, int _atk, int _def, int _dex, int _exp, bool _elite)
     :name(_name), hp(_hp), maxHp(_hp), atk(_atk), def(_def), dex(_dex), exp(_exp), x(0), y(0), isElite(_elite)
@@ -25,7 +27,7 @@ void Monster::TakeDamage(int _damage, int attackerDex)
     {
         // 방어력 계산 적용
         // 최종 데미지 = 공격력 × (1.0 - (방어력 × 0.03))
-        int damageAfterDef = static_cast<int>(_damage * (1.0 - (def * 0.03)));
+        int damageAfterDef = static_cast<int>(std::round(_damage * (1.0 - (def * 0.03))));
 
         hp -= damageAfterDef;
         Render::GetInstance().AddLog(name + "에게 " + std::to_string(damageAfterDef) + "의 데미지!", CLR_WHITE);
