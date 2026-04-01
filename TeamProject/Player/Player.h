@@ -39,6 +39,7 @@ protected:
     int defBonus;
     int dexBonus;
     int hpBonus;
+    int bonusPoint;
 
     Inventory            inventory;
     // vector<StatusEffect> statusEffects;
